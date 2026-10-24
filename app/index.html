@@ -572,7 +572,7 @@ function unionBB(list){let x1=Infinity,y1=Infinity,x2=-Infinity,y2=-Infinity;for
 const pathCache=new WeakMap();
 function strokeWidth(o,p){return o.pr?o.size*(0.3+1.4*clamp(p,0,1)):o.size;}
 function strokeBB(o){const p=o.pts;let x1=Infinity,y1=Infinity,x2=-Infinity,y2=-Infinity;for(let i=0;i<p.length;i+=3){x1=Math.min(x1,p[i]);x2=Math.max(x2,p[i]);y1=Math.min(y1,p[i+1]);y2=Math.max(y2,p[i+1]);}const m=(o.pr?o.size*1.7:o.size)/2+1;return {x:x1-m,y:y1-m,w:x2-x1+2*m,h:y2-y1+2*m};}
-function makeStroke(pts,opt){const o={id:uid(),type:'stroke',pts:pts.map(v=>Math.round(v*100)/100),color:opt.color,size:opt.size,pr:!!opt.pr,hl:!!opt.hl};o.bb=strokeBB(o);return o;}
+function makeStroke(pts,opt){const o={id:uid(),type:'stroke',pts:pts.map(v=>Math.round(v*100)/100),color:opt.color,size:opt.size,pr:!!opt.pr,hl:!!opt.hl};if(opt.st)o.st=1;o.bb=strokeBB(o);return o;}
 function strokePaths(o){
   let c=pathCache.get(o); if(c) return c;
   const p=o.pts,n=p.length/3;
@@ -883,7 +883,9 @@ function renderOver(){const ctx=octx;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clear
   ctx.save();ctx.setTransform(DPR*z,0,0,DPR*z,-view.x*z*DPR,-view.y*z*DPR);
   if(live&&live.shape){const k=clamp((performance.now()-live.flash)/220,0,1);if(k<1){ctx.save();ctx.globalAlpha=(1-k)*.35;drawStroke(ctx,{pts:live.pts,color:live.opt.color,size:live.opt.size,pr:live.opt.pr});ctx.restore();needOver=true;}
     drawShape(ctx,live.shape);}
-  else if(live&&live.pts.length){const o={pts:live.pts,color:live.opt.color,size:live.opt.size,pr:live.opt.pr,hl:live.opt.hl};drawStroke(ctx,o);}
+  else if(live&&live.pts.length){const o={pts:live.pts,color:live.opt.color,size:live.opt.size,pr:live.opt.pr,hl:live.opt.hl};drawStroke(ctx,o);
+    if(live.straight){const mark=(x,y)=>{ctx.save();ctx.lineWidth=2/view.z;ctx.strokeStyle=T.accent;ctx.fillStyle=T.board;ctx.beginPath();ctx.arc(x,y,6/view.z,0,7);ctx.fill();ctx.stroke();ctx.restore();};
+      if(live.snapA)mark(live.s0[0],live.s0[1]);if(live.snapB)mark(live.last[0],live.last[1]);}}
   if(shapePrev)drawShape(ctx,shapePrev);
   ctx.restore();
   // selection
@@ -903,10 +905,22 @@ function renderOver(){const ctx=octx;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clear
     else{const r=Math.max(1.5,hover.size*z/2);ctx.fillStyle=hover.color;ctx.globalAlpha=hover.kind==='marker'?.5:1;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.globalAlpha=1;if(r<4){ctx.strokeStyle=T.muted;ctx.globalAlpha=.6;ctx.beginPath();ctx.arc(x,y,r+3,0,7);ctx.stroke();ctx.globalAlpha=1;}}}
 }
 const RH_OFF=20;let hoverRot=false;
+/* endpoints of straight lines, corners of shapes: Shift-lines snap to them */
+function snapTargets(){const pts=[];const vr={x:view.x-50,y:view.y-50,w:W/view.z+100,h:H/view.z+100};
+  for(const o of objects){if(!inter(bounds(o),vr))continue;
+    if(o.type==='stroke'&&o.st){const p=o.pts;pts.push([p[0],p[1]],[p[p.length-3],p[p.length-2]]);}
+    else if(o.type==='shape'){if(o.kind==='line'||o.kind==='arrow')pts.push([o.x1,o.y1],[o.x2,o.y2]);
+      else if(o.kind==='poly')for(let i=0;i<o.pts.length;i+=2)pts.push([o.pts[i],o.pts[i+1]]);
+      else if(o.kind==='rect'&&!o.ang)pts.push([o.x1,o.y1],[o.x2,o.y1],[o.x2,o.y2],[o.x1,o.y2]);}}
+  return pts;}
+function snapNear(x,y,list,skip){const r=12/view.z;let best=null,bd=r;for(const p of list){if(skip&&Math.hypot(p[0]-skip[0],p[1]-skip[1])<1e-6)continue;const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=p;}}return best;}
 function drawRotHandle(ctx,x,y,hot){ctx.save();ctx.translate(x,y);ctx.fillStyle=hot?T.accent:T.panel;ctx.strokeStyle=hot?T.accent:T.line;ctx.lineWidth=1;ctx.shadowColor='rgba(20,30,60,.18)';ctx.shadowBlur=4;ctx.shadowOffsetY=1;
   ctx.beginPath();ctx.arc(0,0,11,0,7);ctx.fill();ctx.shadowColor='transparent';ctx.stroke();
-  ctx.strokeStyle=hot?'#fff':T.uiFg||'#1c212b';ctx.lineWidth=1.6;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.arc(0,0,5.2,-Math.PI*0.95,Math.PI*0.55);ctx.stroke();
-  const a=Math.PI*0.55,ex=5.2*Math.cos(a),ey=5.2*Math.sin(a);ctx.beginPath();ctx.moveTo(ex-3.4,ey-0.2);ctx.lineTo(ex,ey);ctx.lineTo(ex+0.6,ey-3.4);ctx.stroke();ctx.restore();}
+  const c=hot?'#fff':T.uiFg||'#1c212b';ctx.strokeStyle=ctx.fillStyle=c;ctx.lineWidth=1.7;ctx.lineCap='round';
+  const r=5.4,a0=-Math.PI*0.35,a1=Math.PI*1.25;ctx.beginPath();ctx.arc(0,0,r,a0,a1);ctx.stroke();
+  // arrowhead at the start of the arc, pointing along the rotation (clockwise)
+  const ex=r*Math.cos(a0),ey=r*Math.sin(a0),tx=-Math.sin(a0),ty=Math.cos(a0),nx=Math.cos(a0),ny=Math.sin(a0),L=3.6;
+  ctx.beginPath();ctx.moveTo(ex+tx*L*0.9,ey+ty*L*0.9);ctx.lineTo(ex-tx*L*0.5+nx*L*0.95,ey-ty*L*0.5+ny*L*0.95);ctx.lineTo(ex-tx*L*0.5-nx*L*0.95,ey-ty*L*0.5-ny*L*0.95);ctx.closePath();ctx.fill();ctx.restore();}
 function rotHandleAt(sx,sy){if(!selection.size||tool!=='select')return false;const b=selBB();if(!b)return false;const [x1]=toScreen(b.x,b.y),[,y2]=toScreen(b.x,b.y+b.h);return Math.hypot(sx-(x1-RH_OFF),sy-(y2+RH_OFF))<=13;}
 function frame(){if(needBase){needBase=false;renderBase();positionSelbar();}if(needOver){needOver=false;renderOver();}requestAnimationFrame(frame);}
 
@@ -959,7 +973,8 @@ const touches=new Map();
 let pinch=null;
 let lastDown={t:0,x:0,y:0};
 
-function setTool(t){if(editingId)commitText();tool=t;ls.set('tool',t);document.querySelectorAll('#rail [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));if(t!=='select')setSel([]);hover=null;updateCursor();buildProps();needOver=true;}
+let returnTool=null;
+function setTool(t){returnTool=null;if(editingId)commitText();tool=t;ls.set('tool',t);document.querySelectorAll('#rail [data-tool]').forEach(b=>b.classList.toggle('on',b.dataset.tool===t));if(t!=='select')setSel([]);hover=null;updateCursor();buildProps();needOver=true;}
 function updateCursor(){stage.className=spaceDown||tool==='hand'?(drag&&drag.type==='pan'?'c-grabbing':'c-grab'):tool==='text'?'c-text':tool==='select'?'':tool==='shape'?'c-cross':'c-none';}
 
 function evPos(e){const r=stage.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
@@ -1008,6 +1023,7 @@ function onDown(e){
       if(e.shiftKey){const s=new Set(selection);s.has(hitO.id)?s.delete(hitO.id):s.add(hitO.id);setSel(s);}
       else if(!selection.has(hitO.id))setSel([hitO.id]);
       drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey};needBase=true;$('#selbar').hidden=true;return;}
+    if(returnTool&&!e.shiftKey){const back=returnTool;setSel([]);setTool(back);onDown(e);return;}
     if(!e.shiftKey)setSel([]);
     marquee={x1:wx,y1:wy,x2:wx,y2:wy,add:e.shiftKey};drag={type:'marquee',id:e.pointerId};return;}
 }
@@ -1028,9 +1044,13 @@ function onMove(e){
   switch(drag.type){
     case 'pan':if(e.pointerId!==drag.id)return;view.x-=(sx-drag.sx)/view.z;view.y-=(sy-drag.sy)/view.z;drag.sx=sx;drag.sy=sy;dirtyAll();break;
     case 'draw':{
-      if(e.shiftKey||live.straight){live.straight=true;const x0=live.pts[0],y0=live.pts[1];let ex=wx,ey=wy;
-        const len=Math.hypot(ex-x0,ey-y0),ang=Math.atan2(ey-y0,ex-x0),snap=Math.round(ang/(Math.PI/4))*(Math.PI/4);
-        if(Math.abs(ang-snap)<0.07){ex=x0+len*Math.cos(snap);ey=y0+len*Math.sin(snap);}
+      if(e.shiftKey||live.straight){if(!live.straight){live.straight=true;clearTimeout(live.holdT);live.targets=snapTargets();const s0=snapNear(live.pts[0],live.pts[1],live.targets);live.s0=s0?[s0[0],s0[1]]:[live.pts[0],live.pts[1]];live.snapA=!!s0;}
+        const x0=live.s0[0],y0=live.s0[1];let ex=wx,ey=wy;
+        const se=snapNear(wx,wy,live.targets,live.s0);
+        if(se){ex=se[0];ey=se[1];live.snapB=true;}
+        else{live.snapB=false;const len=Math.hypot(ex-x0,ey-y0),ang=Math.atan2(ey-y0,ex-x0),snap=Math.round(ang/(Math.PI/4))*(Math.PI/4);
+          if(Math.abs(ang-snap)<0.07){ex=x0+len*Math.cos(snap);ey=y0+len*Math.sin(snap);}}
+        const len=Math.hypot(ex-x0,ey-y0);
         const pr=live.pen?(e.pressure||.5):.5;const n=Math.max(2,Math.ceil(len/5));const pts=[];for(let i=0;i<=n;i++){const t=i/n;pts.push(x0+(ex-x0)*t,y0+(ey-y0)*t,pr);}
         live.pts=pts;live.last=[ex,ey];hover={x:wx,y:wy,kind:tool,size:live.opt.size,color:col(live.opt.color)};needOver=true;break;}
       if(live.shape){hover={x:wx,y:wy,kind:tool,size:live.opt.size,color:col(live.opt.color)};needOver=true;break;}
@@ -1068,9 +1088,9 @@ function onUp(e){
   const d=drag;drag=null;
   switch(d.type){
     case 'pan':updateCursor();break;
-    case 'draw':{if(live)clearTimeout(live.holdT);if(live&&live.shape){const sh=Object.assign({},live.shape,{id:uid()});objects=[...objects,sh];commit();live=null;needOver=true;break;}
+    case 'draw':{if(live)clearTimeout(live.holdT);if(live&&live.shape){const sh=Object.assign({},live.shape,{id:uid()});objects=[...objects,sh];commit();live=null;const back=tool;setTool('select');returnTool=back;setSel([sh.id]);needOver=true;break;}
       if(live&&live.pts.length){if(live.pen&&!live.straight){const [x,y]=toWorld(...evPos(e));const L=live.last;if(Math.hypot(x-L[0],y-L[1])*view.z>.6)live.pts.push(x,y,live.pts[live.pts.length-1]);}
-      objects=[...objects,makeStroke(live.pts,live.opt)];commit();}live=null;needOver=true;break;}
+      objects=[...objects,makeStroke(live.pts,Object.assign({},live.opt,{st:live.straight}))];commit();}live=null;needOver=true;break;}
     case 'erase':if(d.gone.size){objects=objects.filter(o=>!d.gone.has(o.id));commit();}else dirtyAll();if(tool!=='eraser')hover=null;break;
     case 'shape':{const s=shapePrev;shapePrev=null;if(Math.hypot(s.x2-s.x1,s.y2-s.y1)*view.z>4){s.id=uid();objects=[...objects,s];commit();}needOver=true;break;}
     case 'laser':break;
@@ -1114,7 +1134,7 @@ window.addEventListener('keydown',e=>{
   if(e.shiftKey&&e.code==='Digit1'){fitAll();return;}
   if(e.shiftKey&&selection.size&&(e.code==='KeyR'||e.code==='KeyH'||e.code==='KeyV')){e.preventDefault();turnSel(e.code==='KeyR'?'rot':e.code==='KeyH'?'flipH':'flipV');return;}
   if(e.code==='Delete'||e.code==='Backspace'){deleteSel();return;}
-  if(e.code==='Escape'){setSel([]);closePanels();closeMenu();hideGraphPanel();hideCodePanel();return;}
+  if(e.code==='Escape'){if(returnTool){const back=returnTool;setSel([]);setTool(back);return;}if(tool!=='select'){setTool('select');return;}setSel([]);closePanels();closeMenu();hideGraphPanel();hideCodePanel();return;}
   if(e.code==='KeyG'){toggleLib();return;}
   if(KEYS[e.code])setTool(KEYS[e.code]);
   const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
