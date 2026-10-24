@@ -305,7 +305,7 @@ button#logo{border:0;cursor:pointer}
 .btn:active,.ib:active,.tbtn:active,.sw:active,.sz:active{transform:scale(.92)}
 #toast{transform:translateX(-50%) translateY(-8px);transition:opacity .2s,transform .25s var(--spring)}
 #toast.show{transform:translateX(-50%) translateY(0)}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:none!important;animation:none!important}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -424,7 +424,9 @@ button#logo{border:0;cursor:pointer}
 <script>
 "use strict";
 /* hide with an exit animation (class .leaving), falls back instantly if motion is reduced */
-const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const reduceMotion={get matches(){return document.documentElement.classList.contains('no-motion');}};
+function setMotion(on){document.documentElement.classList.toggle('no-motion',!on);}
+try{setMotion(localStorage.getItem('doska:motion')!=='false');}catch(e){}
 function hideAnim(el,ms=180,then){if(!el||el.hidden){then&&then();return;}if(reduceMotion.matches){el.hidden=true;then&&then();return;}
   el.classList.add('leaving');clearTimeout(el._lt);el._lt=setTimeout(()=>{el.classList.remove('leaving');el.hidden=true;then&&then();},ms);}
 function showEl(el){clearTimeout(el._lt);el.classList.remove('leaving');el.hidden=false;}
@@ -1188,6 +1190,7 @@ $('#moreBtn').onclick=()=>{if(!$('#menu').hidden){closeMenu();return;}
    <div class="lbl">Цвет фона</div><div class="bgrow">${BG_PRESETS.map(([c,n])=>`<button class="sw${(board.bgColor||'#ffffff')===c?' on':''}" data-bgc="${c}" title="${n}"><i style="background:${c}"></i></button>`).join('')}<label class="sw custom" title="Свой цвет"><input type="color" id="bgPick" value="${board.bgColor||'#ffffff'}"><i></i></label></div>
    <button class="toggle${penMode?' on':''}" data-a="pen"><svg class="i"><use href="#i-stylus"/></svg>Только перо<span class="tr"></span></button>
    <div class="confirm" style="padding-top:0">Пальцем двигаете и масштабируете доску, рисует только стилус. Включается сам, когда планшет коснётся доски.</div>
+   <button class="toggle${reduceMotion.matches?'':' on'}" data-a="motion"><svg class="i"><use href="#i-laser"/></svg>Анимации<span class="tr"></span></button>
    <hr><button class="mi" data-a="copyimg"><svg class="i"><use href="#i-image"/></svg>Копировать ${selection.size?'выделенное':'доску'} картинкой</button>
    ${window.DOSKA_APP?`<button class="mi" data-a="png"><svg class="i"><use href="#i-image"/></svg>Сохранить ${selection.size?'выделенное':'доску'} в PNG</button>
    <button class="mi" data-a="export"><svg class="i"><use href="#i-file"/></svg>Сохранить доску в файл</button>
@@ -1199,6 +1202,7 @@ $('#menu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   if(b.dataset.bg){board.bg=b.dataset.bg;dirtyAll();scheduleSave();b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));return;}
   if(b.dataset.bgc){setBgColor(b.dataset.bgc);b.parentNode.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x===b));return;}
   const a=b.dataset.a;
+  if(a==='motion'){const on=reduceMotion.matches;setMotion(on);ls.set('motion',on);b.classList.toggle('on',on);return;}
   if(a==='pen'){penMode=!penMode;ls.set('penMode',penMode);updatePenModeUI();b.classList.toggle('on',penMode);return;}
   if(a==='fit'){fitAll();closeMenu();return;}
   if(a==='props'){closeMenu();if(board.id){saveNow({fast:true}).then(()=>openPropsDlg(board.id));}return;}
