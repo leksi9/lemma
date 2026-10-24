@@ -3,7 +3,7 @@
 <h1 align="center">Лемма</h1>
 <p align="center">Доска для уроков математики, физики и информатики. Для Windows 10 и 11.</p>
 
-<p align="center"><a href="https://github.com/leksi9/doska/releases/latest/download/Lemma-Setup.exe"><b>⬇ Скачать Лемму (Lemma-Setup.exe)</b></a></p>
+<p align="center"><a href="https://github.com/leksi9/lemma/releases/latest/download/Lemma-Setup.exe"><b>⬇ Скачать Лемму (Lemma-Setup.exe)</b></a></p>
 
 ## Как установить
 
