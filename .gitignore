@@ -4,3 +4,4 @@ Output/
 __pycache__/
 *.spec
 app/pyodide/
+_version.py

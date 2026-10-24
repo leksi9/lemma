@@ -37,6 +37,10 @@ jobs:
           }
           Get-ChildItem app/pyodide | Format-Table Name, Length
 
+      - name: Номер версии для автообновления
+        shell: pwsh
+        run: Set-Content -Encoding utf8 _version.py "VERSION = '$env:VERSION'"
+
       - name: Lemma.exe
         run: python -m PyInstaller --noconfirm --clean --windowed --name Lemma --icon lemma.ico doska.py
 
@@ -57,8 +61,6 @@ jobs:
         with:
           tag_name: v${{ env.VERSION }}
           name: Лемма ${{ env.VERSION }}
-          body: |
-            Скачайте **Lemma-Setup.exe** и запустите. Права администратора не нужны.
-            Доски при обновлении сохраняются.
+          body: ${{ github.event.head_commit.message || 'Обновление Леммы' }}
           files: Output/Lemma-Setup.exe
           make_latest: true

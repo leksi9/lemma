@@ -45,3 +45,4 @@ Name: "{autodesktop}\Лемма"; Filename: "{app}\Lemma.exe"; Tasks: desktopico
 
 [Run]
 Filename: "{app}\Lemma.exe"; Description: "Открыть Лемму"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Lemma.exe"; Flags: nowait skipifnotsilent

@@ -6,6 +6,12 @@
 поэтому перо планшета с нажимом работает так же, как в браузере.
 """
 import base64
+import json
+import subprocess
+import tempfile
+import threading
+import time
+import urllib.request
 import hashlib
 import shutil
 import inspect
@@ -20,6 +26,11 @@ mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("application/json", ".json")
 
 APP_NAME = "Лемма"
+REPO = "leksi9/lemma"
+try:
+    from _version import VERSION  # файл создаётся при сборке установщика
+except ImportError:
+    VERSION = ""  # запуск из исходников: автообновление выключено
 PORT = 47321  # постоянный порт: от него зависит, где браузерный движок хранит доски
 
 
@@ -84,8 +95,92 @@ def save_dialog_type():
     return webview.SAVE_DIALOG
 
 
+def _vtuple(v):
+    try:
+        return tuple(int(x) for x in str(v).lstrip("vV").split("."))
+    except ValueError:
+        return ()
+
+
+def _http(url, timeout=15):
+    req = urllib.request.Request(url, headers={"User-Agent": "Lemma-Updater", "Accept": "application/vnd.github+json"})
+    return urllib.request.urlopen(req, timeout=timeout)
+
+
 class Api:
     """Функции, которые страница вызывает через window.pywebview.api."""
+
+    _update = None
+
+    def app_version(self):
+        return VERSION
+
+    def check_update(self):
+        """Спрашиваем GitHub о последней версии. Ничего не скачиваем."""
+        if not VERSION or not getattr(sys, "frozen", False):
+            return {"ok": True, "available": False, "current": VERSION, "dev": True}
+        try:
+            with _http(f"https://api.github.com/repos/{REPO}/releases/latest") as r:
+                rel = json.loads(r.read().decode("utf-8"))
+        except Exception as e:  # нет интернета и т.п.
+            return {"ok": False, "error": str(e), "current": VERSION}
+        latest = str(rel.get("tag_name", "")).lstrip("vV")
+        asset = next((a for a in rel.get("assets", []) if str(a.get("name", "")).lower().endswith("setup.exe")), None)
+        available = bool(asset) and _vtuple(latest) > _vtuple(VERSION)
+        Api._update = {"version": latest, "url": asset["browser_download_url"], "size": asset.get("size", 0)} if available else None
+        return {"ok": True, "available": available, "current": VERSION, "latest": latest,
+                "notes": rel.get("body") or "", "size": asset.get("size", 0) if asset else 0}
+
+    def install_update(self):
+        """Скачиваем установщик в фоне, сообщаем странице прогресс, затем ставим тихо и перезапускаемся."""
+        upd = Api._update
+        if not upd:
+            return False
+        threading.Thread(target=self._download_and_run, args=(upd,), daemon=True).start()
+        return True
+
+    def _js(self, code):
+        try:
+            webview.windows[0].evaluate_js(code)
+        except Exception:
+            pass
+
+    def _download_and_run(self, upd):
+        path = os.path.join(tempfile.gettempdir(), f"Lemma-Setup-{upd['version']}.exe")
+        try:
+            with _http(upd["url"], timeout=60) as r, open(path + ".part", "wb") as f:
+                total = int(r.headers.get("Content-Length") or upd.get("size") or 0)
+                done, last = 0, 0.0
+                while True:
+                    chunk = r.read(256 * 1024)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    done += len(chunk)
+                    if total and time.time() - last > 0.15:
+                        last = time.time()
+                        self._js(f"window.onUpdateProgress&&onUpdateProgress({done / total:.3f})")
+            if upd.get("size") and os.path.getsize(path + ".part") != upd["size"]:
+                raise IOError("файл скачался не полностью")
+            os.replace(path + ".part", path)
+        except Exception as e:
+            self._js("window.onUpdateFailed&&onUpdateFailed(" + json.dumps(str(e)) + ")")
+            return
+        self._js("window.onUpdateProgress&&onUpdateProgress(1)")
+        self._js("window.onUpdateInstalling&&onUpdateInstalling()")
+        time.sleep(1.2)  # даём странице дописать доски
+        flags = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+        try:
+            subprocess.Popen([path, "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/SP-"],
+                             creationflags=flags, close_fds=True)
+        except Exception as e:
+            self._js("window.onUpdateFailed&&onUpdateFailed(" + json.dumps(str(e)) + ")")
+            return
+        for w in list(webview.windows):
+            try:
+                w.destroy()
+            except Exception:
+                pass
 
     def save_file(self, name, b64data):
         win = webview.windows[0]
