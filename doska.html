@@ -61,6 +61,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 /* bottom */
 #histbar{left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;padding:3px;gap:2px}
 #zoombar{right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;padding:3px;gap:2px}
+#zoombar .zsep{width:1px;height:24px;background:var(--line);margin:0 2px}
 #zoomVal{min-width:54px;text-align:center;font-variant-numeric:tabular-nums;font-size:13px;height:40px;border-radius:9px}
 #zoomVal:hover{background:var(--panel-2)}
 /* props strip */
@@ -459,6 +460,8 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
 </div>
 
 <div id="zoombar" class="float">
+  <button class="ib" id="snapBtn" title="Привязка к сетке"><svg class="i"><use href="#i-magnet"/></svg></button>
+  <span class="zsep"></span>
   <button class="ib" id="zoomOut" title="Отдалить"><svg class="i"><use href="#i-minus"/></svg></button>
   <button id="zoomVal" title="Масштаб 100%">100%</button>
   <button class="ib" id="zoomIn" title="Приблизить"><svg class="i"><use href="#i-plus"/></svg></button>
@@ -1132,7 +1135,10 @@ function onMove(e){
       let sxk=(wx-ax)/((c.includes('w')?b.x:b.x+b.w)-ax),syk=(wy-ay)/((c.includes('n')?b.y:b.y+b.h)-ay);
       const uni=e.shiftKey!==drag.orig.some(o=>o.type==='image'||o.type==='text'||o.type==='code'||(o.type==='fig'&&FIGS[o.kind]&&FIGS[o.kind].uni));
       if(uni){const k=Math.max(sxk,syk);sxk=syk=k;}sxk=Math.max(.05,sxk);syk=Math.max(.05,syk);
-      const f=(x,y)=>[ax+(x-ax)*sxk,ay+(y-ay)*syk];const m=new Map();for(const o of drag.orig)m.set(o.id,transformObj(o,f,sxk,syk));drag.preview=m;drag.f=[sxk,syk];needBase=true;needOver=true;break;}
+      const f=(x,y)=>[ax+(x-ax)*sxk,ay+(y-ay)*syk];const m=new Map();for(const o of drag.orig){let n=transformObj(o,f,sxk,syk);
+        if(S.snapGrid&&drag.orig.length===1){const g=gridStep();if(n.type==='fig'||n.type==='image'){const [x1,y1]=gridSnap(n.x,n.y),[x2,y2]=gridSnap(n.x+n.w,n.y+n.h);n=Object.assign({},n,{x:x1,y:y1,w:Math.max(g,x2-x1),h:Math.max(g,y2-y1)});}
+          else if(boxShape(n)){const [a1,b1]=gridSnap(n.x1,n.y1),[a2,b2]=gridSnap(n.x2,n.y2);n=Object.assign({},n,{x1:a1,y1:b1,x2:a2,y2:b2});}}
+        m.set(o.id,n);}drag.preview=m;drag.f=[sxk,syk];needBase=true;needOver=true;break;}
     case 'marquee':marquee.x2=wx;marquee.y2=wy;{const r={x:Math.min(marquee.x1,wx),y:Math.min(marquee.y1,wy),w:Math.abs(wx-marquee.x1),h:Math.abs(wy-marquee.y1)};selection=new Set(objects.filter(o=>inter(bounds(o),r)).map(o=>o.id));}needOver=true;break;
   }
 }
@@ -1176,9 +1182,12 @@ function isFullscreen(){return !!(document.fullscreenElement||window.__lemmaFull
 async function toggleFullscreen(){const api=window.pywebview&&window.pywebview.api;
   if(api&&api.toggle_fullscreen){try{await api.toggle_fullscreen();window.__lemmaFull=!window.__lemmaFull;return;}catch(e){}}
   try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){toast('Полноэкранный режим недоступен в этом окне');}}
+function setSnap(on,quiet){S.snapGrid=!!on;ls.set('settings',S);const b=$('#snapBtn');b.classList.toggle('on',S.snapGrid);b.title=S.snapGrid?'Привязка к сетке включена':'Привязка к сетке выключена';
+  if(!quiet)toast(S.snapGrid?'Привязка к сетке включена: фигуры, прямые с Shift и вершины встают по клеткам':'Привязка к сетке выключена');}
 function gridStep(){return board.bg==='dots'?25:20;}
 function zoomTo(z){zoomAt(W/2,H/2,z/view.z);}
 function fitAll(){const b=unionBB(objects);if(!b){view.z=1;view.x=-W/2;view.y=-H/2;dirtyAll();return;}const z=clamp(Math.min((W-200)/b.w,(H-180)/b.h),.08,2);view.z=z;view.x=b.x+b.w/2-W/2/z;view.y=b.y+b.h/2-H/2/z;dirtyAll();}
+$('#snapBtn').onclick=()=>setSnap(!S.snapGrid);
 $('#zoomIn').onclick=()=>zoomTo(view.z*1.25);$('#zoomOut').onclick=()=>zoomTo(view.z/1.25);$('#zoomVal').onclick=()=>{if(!$('#menu').hidden&&$('#menu').dataset.kind==='zoom'){closeMenu();return;}openZoomMenu();};$('#zoomFit').onclick=fitAll;
 $('#undoBtn').onclick=undo;$('#redoBtn').onclick=redo;
 
@@ -1306,7 +1315,7 @@ $('#libBody').addEventListener('click',async e=>{if(libSuppressClick){e.stopProp
 $('#libBody').addEventListener('dblclick',e=>{const tr=e.target.closest('[data-tr]');if(!tr)return;const id=tr.dataset.tr;const t=templates.find(x=>x.id===id);if(!t)return;
   tr.outerHTML=`<input class="tren" value="${esc(t.name)}" maxlength="60" aria-label="Название заготовки">`;const inp=$('#libBody .tren');inp.focus();inp.select();let done=false;
   const fin=async ok=>{if(done)return;done=true;if(ok)await renameTemplate(id,inp.value);renderLib();};inp.addEventListener('keydown',ev=>{ev.stopPropagation();if(ev.key==='Enter')fin(true);if(ev.key==='Escape')fin(false);});inp.addEventListener('blur',()=>fin(true));});
-function insertFig(k,params,at){const f=FIGS[k];const [cx,cy]=at||toWorld(W/2,H/2);const o={id:uid(),type:'fig',kind:f.as||k,x:cx-f.w/2,y:cy-f.h/2,w:f.w,h:f.h,color:'ink',params:params||(f.params?JSON.parse(JSON.stringify(f.params)):undefined)};
+function insertFig(k,params,at){const f=FIGS[k];const [cx,cy]=at||toWorld(W/2,H/2);let bx=cx-f.w/2,by=cy-f.h/2,bw=f.w,bh=f.h;if(S.snapGrid){const g=gridStep();bw=Math.max(g,Math.round(f.w/g)*g);bh=Math.max(g,Math.round(f.h/g)*g);[bx,by]=gridSnap(cx-bw/2,cy-bh/2);}const o={id:uid(),type:'fig',kind:f.as||k,x:bx,y:by,w:bw,h:bh,color:'ink',params:params||(f.params?JSON.parse(JSON.stringify(f.params)):undefined)};
   objects=[...objects,o];commit();setTool('select');setSel([o.id]);popIn([o.id]);if(isGraph(o)){if(!graphItems(o.params).length)addGraphRow();}return o;}
 /* ---------- live graph panel ---------- */
 let gpId=null,gCommitT=null;
@@ -1430,7 +1439,7 @@ $('#moreBtn').onclick=()=>{if(!$('#menu').hidden){closeMenu();return;}
 $('#menu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.z){zoomTo(+b.dataset.z/100);closeMenu();return;}
   if(b.dataset.a==='full'){toggleFullscreen();closeMenu();return;}
-  if(b.dataset.a==='snap'){S.snapGrid=!S.snapGrid;ls.set('settings',S);b.classList.toggle('on',S.snapGrid);return;}
+  if(b.dataset.a==='snap'){setSnap(!S.snapGrid);b.classList.toggle('on',S.snapGrid);return;}
   if(b.dataset.bg){board.bg=b.dataset.bg;dirtyAll();scheduleSave();b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));return;}
   if(b.dataset.bgc){setBgColor(b.dataset.bgc);b.parentNode.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x===b));return;}
   const a=b.dataset.a;
@@ -1709,7 +1718,7 @@ async function saveTemplate(name){const objs=selObjs();const b=unionBB(objs);if(
   const norm=objs.map(o=>{const n=transformObj(o,(x,y)=>[x-b.x,y-b.y],1,1);delete n.bb;return n;});
   const t={id:uid(),name:name.trim().slice(0,60)||'Заготовка',objects:norm,w:b.w,h:b.h,thumb:makeThumb(objs,board.bgColor||'#ffffff','none'),created:Date.now()};
   templates.unshift(t);await tx('readwrite',s=>s.put(t),'templates');toast('Сохранено в «Мои заготовки»');if(!$('#lib').hidden&&libTab==='mine')renderLib();}
-function insertTemplate(id,at){const t=templates.find(x=>x.id===id);if(!t)return;const [cx,cy]=at||toWorld(W/2,H/2);const dx=cx-t.w/2,dy=cy-t.h/2;
+function insertTemplate(id,at){const t=templates.find(x=>x.id===id);if(!t)return;const [cx,cy]=at||toWorld(W/2,H/2);let dx=cx-t.w/2,dy=cy-t.h/2;if(S.snapGrid)[dx,dy]=gridSnap(dx,dy);
   const add=t.objects.map(o=>{const n=transformObj(o,(x,y)=>[x+dx,y+dy],1,1);n.id=uid();return n;});
   objects=[...objects,...add];commit();setTool('select');setSel(add.map(o=>o.id));popIn(add.map(o=>o.id));}
 async function deleteTemplate(id){templates=templates.filter(t=>t.id!==id);await tx('readwrite',s=>s.delete(id),'templates');renderLib();toast('Заготовка удалена');}
@@ -1751,7 +1760,7 @@ function drawCode(ctx,o){const L=codeLayout(o),C=codeColors(),{s,lh,pad,head}=L,
     ctx.font=`${s}px ${MONO}`;let y2=oy+pad*.6+lh+lh*.75;const errFrom=L.errFrom;
     L.outLines.forEach((t,i)=>{ctx.fillStyle=i>=errFrom?C.err:C.fg;ctx.fillText(t,x+pad,y2);y2+=lh;});}
   ctx.restore();ctx.restore();}
-function newCodeBlock(at){const [cx,cy]=at||toWorld(W/2,H/2);const o={id:uid(),type:'code',x:cx-220,y:cy-140,w:440,size:15,code:'# Сумма цифр числа\nn = int(input())\ns = 0\nwhile n > 0:\n    s += n % 10\n    n //= 10\nprint(s)',inp:'2026',out:'',err:''};
+function newCodeBlock(at){const [cx,cy]=at||toWorld(W/2,H/2);const [bx,by]=S.snapGrid?gridSnap(cx-220,cy-140):[cx-220,cy-140];const o={id:uid(),type:'code',x:bx,y:by,w:440,size:15,code:'# Сумма цифр числа\nn = int(input())\ns = 0\nwhile n > 0:\n    s += n % 10\n    n //= 10\nprint(s)',inp:'2026',out:'',err:''};
   objects=[...objects,o];commit();setTool('select');setSel([o.id]);popIn([o.id]);openCodePanel(o.id,true);}
 
 /* runner: Pyodide in a worker, so a hung program can be stopped */
@@ -1898,7 +1907,7 @@ function seedExample(){const o=[];const add=x=>{x.id=uid();o.push(x);return x;};
   return o;}
 
 /* ============ boot ============ */
-async function boot(){resize();readTheme();setTool(tool);updatePenModeUI();updateHistUI();requestAnimationFrame(frame);
+async function boot(){setSnap(S.snapGrid,true);resize();readTheme();setTool(tool);updatePenModeUI();updateHistUI();requestAnimationFrame(frame);
   db=await idb();await loadMeta();try{await loadTemplates();}catch(e){}const cur=ls.get('current',null);
   const pick=boardsMeta.find(b=>b.id===cur)||[...boardsMeta].sort((a,b)=>b.updated-a.updated)[0];
   let rec=pick?await tx('readonly',s=>s.get(pick.id)):null;
