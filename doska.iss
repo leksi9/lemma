@@ -4,20 +4,20 @@
 
 [Setup]
 AppId={{B3D1F0A2-6C1E-4E57-9C55-6A4D0B7D2F11}
-AppName=Доска
+AppName=Лемма
 AppVersion={#AppVersion}
-AppVerName=Доска {#AppVersion}
-AppPublisher=Доска репетитора
+AppVerName=Лемма {#AppVersion}
+AppPublisher=Лемма
 DefaultDirName={localappdata}\Programs\Doska
-DefaultGroupName=Доска
+DefaultGroupName=Лемма
 DisableProgramGroupPage=yes
 DisableDirPage=yes
 PrivilegesRequired=lowest
 OutputDir=Output
-OutputBaseFilename=Doska-Setup
-SetupIconFile=doska.ico
-UninstallDisplayIcon={app}\Doska.exe
-UninstallDisplayName=Доска
+OutputBaseFilename=Lemma-Setup
+SetupIconFile=lemma.ico
+UninstallDisplayIcon={app}\Lemma.exe
+UninstallDisplayName=Лемма
 Compression=lzma2/max
 SolidCompression=yes
 WizardStyle=modern
@@ -31,14 +31,17 @@ Name: "ru"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "desktopicon"; Description: "Создать значок на рабочем столе"; GroupDescription: "Значки:"
 
 [Files]
-Source: "dist\Doska\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\Lemma\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\_internal"
+Type: files; Name: "{app}\Doska.exe"
+Type: files; Name: "{autoprograms}\Доска.lnk"
+Type: files; Name: "{autodesktop}\Доска.lnk"
 
 [Icons]
-Name: "{autoprograms}\Доска"; Filename: "{app}\Doska.exe"
-Name: "{autodesktop}\Доска"; Filename: "{app}\Doska.exe"; Tasks: desktopicon
+Name: "{autoprograms}\Лемма"; Filename: "{app}\Lemma.exe"
+Name: "{autodesktop}\Лемма"; Filename: "{app}\Lemma.exe"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\Doska.exe"; Description: "Открыть доску"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Lemma.exe"; Description: "Открыть Лемму"; Flags: nowait postinstall skipifsilent

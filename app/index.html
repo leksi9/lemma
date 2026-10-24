@@ -7,7 +7,7 @@
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
-<title>Доска репетитора</title>
+<title>Лемма</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
@@ -59,7 +59,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 #rail hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 /* top-left board pill */
 #boardpill{left:max(12px,env(safe-area-inset-left,0px));top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:4px;padding:4px 6px 4px 10px;height:46px}
-#logo{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center;color:#fff;font-family:var(--math);font-style:italic;font-size:17px;flex:none}
+#logo{width:30px;height:30px;padding:0;background:none;flex:none;display:block}#logo svg,.glogo svg{width:100%;height:100%;display:block}
 #boardBtn{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;font-weight:500;max-width:240px}
 #boardBtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #boardBtn:hover{background:var(--panel-2)}
@@ -173,7 +173,7 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 #gallery{position:fixed;inset:0;z-index:45;background:var(--gal);overflow-y:auto}
 .gwrap{max-width:1280px;margin:0 auto;padding-block:calc(22px + env(safe-area-inset-top,0px)) 48px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
 .ghead{display:flex;align-items:center;gap:14px}
-.glogo{width:40px;height:40px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center;font:italic 26px var(--math);flex:none}
+.glogo{width:44px;height:44px;flex:none}
 .gbrand{display:flex;flex-direction:column;flex:1;min-width:0}
 .gbrand b{font-size:17px;font-weight:600}
 .gbrand span{font-size:12px;color:var(--muted)}
@@ -286,13 +286,16 @@ button#logo{border:0;cursor:pointer}
  <symbol id="i-back" viewBox="0 0 24 24"><rect x="4" y="4" width="11" height="11" rx="1.5" fill="currentColor" fill-opacity=".18"/><path d="M15 9h3.5a1.5 1.5 0 011.5 1.5v8a1.5 1.5 0 01-1.5 1.5h-8A1.5 1.5 0 019 18.5V15"/></symbol>
  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5"/></symbol>
  <symbol id="i-stylus" viewBox="0 0 24 24"><path d="M15 4l5 5-9.5 9.5-6 1.5 1.5-6z"/><path d="M13 6l5 5"/></symbol>
+ <symbol id="i-rot" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
+ <symbol id="i-flipH" viewBox="0 0 24 24"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 6L3 18h6z"/><path d="M15 6l6 12h-6z" fill="currentColor" fill-opacity=".2"/></symbol>
+ <symbol id="i-flipV" viewBox="0 0 24 24"><path d="M3 12h18" stroke-dasharray="2 2.5"/><path d="M6 9L18 3v6z"/><path d="M6 15l12 6v-6z" fill="currentColor" fill-opacity=".2"/></symbol>
  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
 </svg>
 
 <div id="stage" class="c-none"><canvas id="base"></canvas><canvas id="over"></canvas></div>
 
 <div id="boardpill" class="float">
-  <button id="logo" title="Все доски" aria-label="Все доски">∂</button>
+  <button id="logo" title="Все доски" aria-label="Все доски"><svg viewBox="0 0 256 256" aria-hidden="true"><rect x="8" y="8" width="240" height="240" rx="56" fill="#fff"/><g stroke="#d9e1f5" stroke-width="3"><line x1="48" y1="20" x2="48" y2="236"/><line x1="20" y1="48" x2="236" y2="48"/><line x1="88" y1="20" x2="88" y2="236"/><line x1="20" y1="88" x2="236" y2="88"/><line x1="128" y1="20" x2="128" y2="236"/><line x1="20" y1="128" x2="236" y2="128"/><line x1="168" y1="20" x2="168" y2="236"/><line x1="20" y1="168" x2="236" y2="168"/><line x1="208" y1="20" x2="208" y2="236"/><line x1="20" y1="208" x2="236" y2="208"/></g><rect x="8" y="8" width="240" height="240" rx="56" fill="none" stroke="#dfe4ee" stroke-width="4"/><path d="M174 50c-12-12-38-10-46 14c-6 20-8 60-12 100c-4 36-14 46-32 46c-12 0-20-6-22-12" fill="none" stroke="#2b59e0" stroke-width="22" stroke-linecap="round"/></svg></button>
   <button id="boardBtn" title="Все доски"><span class="bt"><span id="boardName">Доска</span><small id="boardSub"></small></span><svg class="i" style="width:16px;height:16px"><use href="#i-down"/></svg></button>
   <span id="saved">Сохранено</span>
 </div>
@@ -351,7 +354,7 @@ button#logo{border:0;cursor:pointer}
 </aside>
 <section id="gallery" hidden aria-label="Мои доски">
   <div class="gwrap">
-    <header class="ghead"><div class="glogo" aria-hidden="true">∂</div><div class="gbrand"><b>Доска</b><span id="gver"></span></div>
+    <header class="ghead"><div class="glogo"><svg viewBox="0 0 256 256" aria-hidden="true"><rect x="8" y="8" width="240" height="240" rx="56" fill="#fff"/><g stroke="#d9e1f5" stroke-width="3"><line x1="48" y1="20" x2="48" y2="236"/><line x1="20" y1="48" x2="236" y2="48"/><line x1="88" y1="20" x2="88" y2="236"/><line x1="20" y1="88" x2="236" y2="88"/><line x1="128" y1="20" x2="128" y2="236"/><line x1="20" y1="128" x2="236" y2="128"/><line x1="168" y1="20" x2="168" y2="236"/><line x1="20" y1="168" x2="236" y2="168"/><line x1="208" y1="20" x2="208" y2="236"/><line x1="20" y1="208" x2="236" y2="208"/></g><rect x="8" y="8" width="240" height="240" rx="56" fill="none" stroke="#dfe4ee" stroke-width="4"/><path d="M174 50c-12-12-38-10-46 14c-6 20-8 60-12 100c-4 36-14 46-32 46c-12 0-20-6-22-12" fill="none" stroke="#2b59e0" stroke-width="22" stroke-linecap="round"/></svg></div><div class="gbrand"><b>Лемма</b><span id="gver"></span></div>
       <input id="gsearch" type="search" placeholder="Поиск: название, ученик, тема урока" autocomplete="off" aria-label="Поиск по доскам">
       <button class="ib" id="gcloseBtn" title="Вернуться к доске (Esc)"><svg class="i"><use href="#i-x"/></svg></button></header>
     <div class="gbody"><nav id="gside" aria-label="Ученики"></nav>
@@ -471,7 +474,7 @@ function drawText(ctx,o){if(o.id===editingId)return;ctx.font=textFont(o);ctx.fil
 /* ============ images ============ */
 const imgCache=new Map();
 function getImg(src){let im=imgCache.get(src);if(!im){im=new Image();im.onload=()=>dirtyAll();im.src=src;imgCache.set(src,im);}return im;}
-function drawImage(ctx,o){const im=getImg(o.src);if(im.complete&&im.naturalWidth){ctx.drawImage(im,o.x,o.y,o.w,o.h);}else{ctx.fillStyle=T.line;ctx.fillRect(o.x,o.y,o.w,o.h);}}
+function drawImage(ctx,o){const im=getImg(o.src);ctx.save();const t=orient(ctx,o);if(im.complete&&im.naturalWidth){ctx.drawImage(im,0,0,t.iw,t.ih);}else{ctx.fillStyle=T.line;ctx.fillRect(0,0,t.iw,t.ih);}ctx.restore();}
 
 /* ============ figures library ============ */
 const LABEL_FONT='italic 19px "STIX Two Text", "Times New Roman", serif';
@@ -556,8 +559,12 @@ function drawGraph(ctx,w,h,o){const {X,Y,p}=axesPlane(ctx,w,h,o);const items=gra
   ctx.font='italic 17px "STIX Two Text", serif';ctx.textAlign='left';ctx.textBaseline='top';
   labs.forEach(([t,c],i)=>{const tw=ctx.measureText(t).width;ctx.fillStyle=T.board;ctx.globalAlpha=.85;ctx.fillRect(8,8+i*24,tw+10,22);ctx.globalAlpha=1;ctx.fillStyle=c;ctx.fillText(t,13,10+i*24);});}
 
-function drawTable(ctx,w,h,o,spec){const nw=spec.cols.reduce((a,b)=>a+b,0),rh=spec.rh||34,th=spec.title?36:0,nh=th+spec.rows.length*rh;
-  ctx.save();ctx.scale(w/nw,h/nh);
+function fitCols(spec){const fs=spec.fs||18;const hr=spec.hRows??1;const c=bctx;c.save();
+  const cols=spec.cols.map((base,ci)=>{let mw=0;spec.rows.forEach((row,r)=>{const head=r<hr||(spec.hCol&&ci===0);c.font=(head?'600 ':'')+fs+'px "STIX Two Text", "Times New Roman", serif';mw=Math.max(mw,c.measureText(String(row[ci]??'')).width);});return Math.max(base,Math.ceil(mw+(spec.left?28:22)));});
+  c.restore();spec._cols=cols;return cols;}
+function colsOf(spec){return spec._cols||fitCols(spec);}
+function drawTable(ctx,w,h,o,spec){spec={...spec,cols:colsOf(spec)};const nw=spec.cols.reduce((a,b)=>a+b,0),rh=spec.rh||34,th=spec.title?36:0,nh=th+spec.rows.length*rh;
+  ctx.save();{const k=Math.min(w/nw,h/nh);ctx.scale(k,k);}
   if(spec.title){ctx.font='600 17px "Golos Text", sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(spec.title,2,th/2-2);}
   ctx.translate(0,th);
   ctx.fillStyle=T.paper;ctx.fillRect(0,0,nw,spec.rows.length*rh);ctx.fillStyle=T.tableHead;
@@ -568,7 +575,7 @@ function drawTable(ctx,w,h,o,spec){const nw=spec.cols.reduce((a,b)=>a+b,0),rh=sp
   ctx.fillStyle=col(o.color);ctx.textBaseline='middle';
   spec.rows.forEach((row,r)=>{let x=0;row.forEach((cell,c)=>{const head=r<hr||(spec.hCol&&c===0);ctx.font=(head?'600 ':'')+(spec.fs||18)+'px "STIX Two Text", serif';ctx.textAlign=spec.left?'left':'center';ctx.fillText(String(cell),spec.left?x+12:x+spec.cols[c]/2,r*rh+rh/2+1);x+=spec.cols[c];});});
   ctx.restore();}
-function tsize(spec){return [spec.cols.reduce((a,b)=>a+b,0),(spec.title?36:0)+spec.rows.length*(spec.rh||34)];}
+function tsize(spec){return [colsOf(spec).reduce((a,b)=>a+b,0),(spec.title?36:0)+spec.rows.length*(spec.rh||34)];}
 
 const TB={};
 TB.squares={title:'Таблица квадратов двузначных чисел',cols:[46,...Array(10).fill(56)],hCol:true,rows:[['',...[0,1,2,3,4,5,6,7,8,9]],...[1,2,3,4,5,6,7,8,9].map(d=>[d,...[0,1,2,3,4,5,6,7,8,9].map(u=>(10*d+u)**2)])]};
@@ -656,13 +663,19 @@ const FIGS={
  bases:{g:'inf',name:'Системы счисления',uni:true,table:'bases'},
  truth:{g:'inf',name:'Таблица истинности',uni:true,table:'truth'},
 };
-for(const k in FIGS){const f=FIGS[k];if(f.table){const [w,h]=tsize(TB[f.table]);f.w=w;f.h=h;f.draw=(c,w,h,o)=>drawTable(c,w,h,o,TB[f.table]);}}
+function sizeTables(){for(const k in FIGS){const f=FIGS[k];if(f.table){delete TB[f.table]._cols;const [w,h]=tsize(TB[f.table]);f.w=w;f.h=h;f.draw=(c,w,h,o)=>drawTable(c,w,h,o,TB[f.table]);}}}
+sizeTables();
 const GROUPS=[['plan','Планиметрия'],['stereo','Стереометрия'],['coord','Графики'],['tab','Таблицы'],['inf','Информатика'],['phys','Физика']];
 
-function drawFig(ctx,o){const f=FIGS[o.kind];if(!f)return;ctx.save();ctx.translate(o.x,o.y);
+/* orientation: displayed box o.x,o.y,o.w,o.h; inner drawing is rotated by rot·90° and mirrored by fx/fy */
+function orient(ctx,o){const rot=((o.rot|0)%4+4)%4,fx=o.fx===-1?-1:1,fy=o.fy===-1?-1:1;const iw=rot%2?o.h:o.w,ih=rot%2?o.w:o.h;
+  ctx.translate(o.x+o.w/2,o.y+o.h/2);if(rot)ctx.rotate(rot*Math.PI/2);if(fx<0||fy<0)ctx.scale(fx,fy);ctx.translate(-iw/2,-ih/2);return {rot,fx,fy,iw,ih,turned:rot||fx<0||fy<0};}
+function drawFig(ctx,o){const f=FIGS[o.kind];if(!f)return;ctx.save();const t=orient(ctx,o);
   ctx.strokeStyle=ctx.fillStyle=col(o.color);ctx.lineWidth=o.lw||2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.font=LABEL_FONT;ctx.textAlign='center';ctx.textBaseline='middle';
-  const noLab=LABELABLE.has(f.g)&&!o.labels;if(noLab)ctx.fillText=()=>{};
-  try{f.draw(ctx,o.w,o.h,o);}catch(e){}if(noLab)delete ctx.fillText;ctx.restore();}
+  const noLab=LABELABLE.has(f.g)&&!o.labels;
+  if(noLab)ctx.fillText=()=>{};
+  else if(t.turned){const ft=CanvasRenderingContext2D.prototype.fillText;ctx.fillText=function(txt,x,y,mw){this.save();this.translate(x,y);this.scale(t.fx,t.fy);this.rotate(-t.rot*Math.PI/2);ft.call(this,txt,0,0,mw);this.restore();};}
+  try{f.draw(ctx,t.iw,t.ih,o);}catch(e){}delete ctx.fillText;ctx.restore();}
 const LABELABLE=new Set(['plan','stereo']);
 
 /* ============ generic object ops ============ */
@@ -746,13 +759,26 @@ function _buildSelbar(){const bar=$('#selbar');const objs=selObjs();if(!objs.len
   if(labFigs.length)h+=`<button class="tbtn${labFigs.every(o=>o.labels)?' on':''}" data-a="labels" title="Подписи вершин" style="font:italic 16px var(--math)">AB</button>`;
   if(one&&isGraph(one))h+=`<button class="tbtn" data-a="edit" title="Функции на плоскости"><svg class="i"><use href="#i-edit"/></svg></button>`;
   if(one&&one.type==='text')h+=`<button class="tbtn" data-a="edittext" title="Редактировать текст"><svg class="i"><use href="#i-edit"/></svg></button>`;
+  if(objs.some(o=>o.type!=='text'))h+=`<button class="tbtn" data-a="rot" title="Повернуть на 90° (Shift+R)"><svg class="i"><use href="#i-rot"/></svg></button><button class="tbtn" data-a="flipH" title="Отразить слева направо (Shift+H)"><svg class="i"><use href="#i-flipH"/></svg></button><button class="tbtn" data-a="flipV" title="Отразить сверху вниз (Shift+V)"><svg class="i"><use href="#i-flipV"/></svg></button><span class="sep" style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>`;
   h+=`<button class="tbtn" data-a="dup" title="Дублировать (Ctrl+D)"><svg class="i"><use href="#i-copy"/></svg></button><button class="tbtn" data-a="front" title="На передний план"><svg class="i"><use href="#i-front"/></svg></button><button class="tbtn" data-a="back" title="На задний план"><svg class="i"><use href="#i-back"/></svg></button><button class="tbtn del" data-a="del" title="Удалить (Delete)"><svg class="i"><use href="#i-trash"/></svg></button>`;
   bar.innerHTML=h;needBase=true;}
 $('#selbar').addEventListener('pointerdown',e=>e.stopPropagation());
 $('#selbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.c){const m=new Map();for(const o of selObjs()){if(o.type==='image')continue;m.set(o.id,Object.assign({},o,{color:b.dataset.c}));}replaceObjs(m);commit();buildSelbar();return;}
-  const a=b.dataset.a;if(a==='del')deleteSel();else if(a==='dup')duplicateSel();else if(a==='front'||a==='back'){const s=selObjs(),r=objects.filter(o=>!selection.has(o.id));objects=a==='front'?[...r,...s]:[...s,...r];commit();}
+  const a=b.dataset.a;if(a==='rot'){turnSel('rot');return;}if(a==='flipH'||a==='flipV'){turnSel(a);return;}if(a==='del')deleteSel();else if(a==='dup')duplicateSel();else if(a==='front'||a==='back'){const s=selObjs(),r=objects.filter(o=>!selection.has(o.id));objects=a==='front'?[...r,...s]:[...s,...r];commit();}
   else if(a==='edit'){openGraphPanel(selObjs()[0].id,true);}else if(a==='labels'){const lf=selObjs().filter(o=>o.type==='fig'&&FIGS[o.kind]&&LABELABLE.has(FIGS[o.kind].g));const on=!lf.every(o=>o.labels);replaceObjs(new Map(lf.map(o=>[o.id,Object.assign({},o,{labels:on})])));commit();buildSelbar();}else if(a==='edittext'){editText(selObjs()[0]);}});
+function turnSel(op){const objs=selObjs();if(!objs.length)return;const b=selBB();const cx=b.x+b.w/2,cy=b.y+b.h/2;
+  const f=op==='rot'?(x,y)=>[cx-(y-cy),cy+(x-cx)]:op==='flipH'?(x,y)=>[2*cx-x,y]:(x,y)=>[x,2*cy-y];
+  const m=new Map();
+  for(const o of objs){let n;
+    if(o.type==='stroke'||o.type==='shape'){n=transformObj(o,f,1,1);}
+    else if(o.type==='fig'||o.type==='image'){const [nx,ny]=f(o.x+o.w/2,o.y+o.h/2);n=Object.assign({},o);const rot=((o.rot|0)%4+4)%4;
+      if(op==='rot'){n.w=o.h;n.h=o.w;n.rot=(rot+1)%4;}
+      else{n.rot=(4-rot)%4;if(op==='flipH')n.fx=o.fx===-1?1:-1;else n.fy=o.fy===-1?1:-1;}
+      n.x=nx-n.w/2;n.y=ny-n.h/2;}
+    else if(o.type==='text'){const bb=textBB(o);const [nx,ny]=f(bb.x+bb.w/2,bb.y+bb.h/2);n=Object.assign({},o,{x:nx-bb.w/2,y:ny-bb.h/2});}
+    if(n)m.set(o.id,n);}
+  replaceObjs(m);commit();buildSelbar();}
 function isGraph(o){return !!o&&o.type==='fig'&&(o.kind==='graph'||o.kind==='plane');}
 function deleteSel(){if(!selection.size)return;objects=objects.filter(o=>!selection.has(o.id));setSel([]);commit();}
 function cloneObj(o,dx,dy){const n=transformObj(o,(x,y)=>[x+dx,y+dy],1,1);n.id=uid();return n;}
@@ -908,6 +934,7 @@ window.addEventListener('keydown',e=>{
   if(mod)return;
   if(e.code==='Space'&&!spaceDown){spaceDown=true;hover=null;needOver=true;updateCursor();e.preventDefault();return;}
   if(e.shiftKey&&e.code==='Digit1'){fitAll();return;}
+  if(e.shiftKey&&selection.size&&(e.code==='KeyR'||e.code==='KeyH'||e.code==='KeyV')){e.preventDefault();turnSel(e.code==='KeyR'?'rot':e.code==='KeyH'?'flipH':'flipV');return;}
   if(e.code==='Delete'||e.code==='Backspace'){deleteSel();return;}
   if(e.code==='Escape'){setSel([]);closePanels();closeMenu();hideGraphPanel();return;}
   if(e.code==='KeyG'){toggleLib();return;}
@@ -1178,7 +1205,7 @@ function applyBoard(rec){const m=boardsMeta.find(b=>b.id===rec.id)||{};
   applyBoardTheme();objects=(rec.objects||[]).map(o=>{if(o.type==='stroke'&&!o.bb)o.bb=strokeBB(o);return o;});hist={stack:[objects.slice()],idx:0};selection=new Set();
   if(rec.view){view.x=rec.view.x;view.y=rec.view.y;view.z=rec.view.z;}else{view.z=1;view.x=-W/2;view.y=-H/2;}
   updatePill();ls.set('current',board.id);updateHistUI();buildSelbar();dirtyAll();$('#saved').textContent=db?'Сохранено':'Не сохраняется в этом окне';}
-function updatePill(){$('#boardName').textContent=board.name||'Доска';document.title=(board.name||'Доска')+' — Доска';
+function updatePill(){$('#boardName').textContent=board.name||'Доска';document.title=(board.name||'Доска')+' — Лемма';
   const f=folders.find(x=>x.id===board.folder);$('#boardSub').textContent=(f?f.name+' · ':'')+(board.date?shortLesson(board.date):'');}
 async function createBoard(props={}){if(board.id)await saveNow({thumb:true});
   const date=props.date||todayISO();
@@ -1332,7 +1359,7 @@ async function boot(){resize();readTheme();setTool(tool);updatePenModeUI();updat
   if(!rec){rec={id:uid(),name:'Пример урока',date:todayISO(),tags:['пример'],bg:'grid',bgColor:'#ffffff',objects:seedExample(),view:null,updated:Date.now()};applyBoard(rec);fitAll();await saveNow({thumb:true});}
   else applyBoard(rec);
   openGallery();
-  if(document.fonts){document.fonts.load('19px "STIX Two Text"');document.fonts.load('italic 19px "STIX Two Text"');document.fonts.load('16px "Golos Text"');document.fonts.ready.then(()=>{textCache=new WeakMap();dirtyAll();renderLibThumbs();});}
+  if(document.fonts){document.fonts.load('19px "STIX Two Text"');document.fonts.load('italic 19px "STIX Two Text"');document.fonts.load('16px "Golos Text"');document.fonts.ready.then(()=>{sizeTables();textCache=new WeakMap();dirtyAll();renderLibThumbs();});}
   window.addEventListener('pagehide',()=>saveNow({fast:true}));document.addEventListener('visibilitychange',()=>{if(document.hidden)saveNow({fast:true});});}
 boot();
 </script>

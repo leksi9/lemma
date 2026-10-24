@@ -26,12 +26,12 @@ jobs:
       - name: Страница доски
         run: python build.py doska.html
 
-      - name: Doska.exe
-        run: python -m PyInstaller --noconfirm --clean --windowed --name Doska --icon doska.ico --add-data "app;app" doska.py
+      - name: Lemma.exe
+        run: python -m PyInstaller --noconfirm --clean --windowed --name Lemma --icon lemma.ico --add-data "app;app" doska.py
 
       - name: Страница рядом с exe
         shell: cmd
-        run: xcopy /E /I /Y app dist\Doska\app
+        run: xcopy /E /I /Y app dist\Lemma\app
 
       - name: Установщик
         shell: pwsh
@@ -45,9 +45,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
-          name: Доска ${{ env.VERSION }}
+          name: Лемма ${{ env.VERSION }}
           body: |
-            Скачайте **Doska-Setup.exe** и запустите. Права администратора не нужны.
+            Скачайте **Lemma-Setup.exe** и запустите. Права администратора не нужны.
             Доски при обновлении сохраняются.
-          files: Output/Doska-Setup.exe
+          files: Output/Lemma-Setup.exe
           make_latest: true

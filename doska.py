@@ -1,4 +1,4 @@
-"""Доска репетитора — настольное приложение (Windows).
+"""Лемма — доска для уроков, настольное приложение (Windows).
 
 Запуск:  pythonw doska.py   (или двойной клик по «Запустить доску.bat»)
 Нужно:   Python 3.9+ и пакет pywebview (pip install pywebview).
@@ -14,7 +14,7 @@ import sys
 
 import webview
 
-APP_NAME = "Доска"
+APP_NAME = "Лемма"
 PORT = 47321  # постоянный порт: от него зависит, где браузерный движок хранит доски
 
 
@@ -53,7 +53,7 @@ def fresh_copy(index):
 
 def data_dir():
     root = os.environ.get("APPDATA") or os.path.expanduser("~")
-    path = os.path.join(root, "Doska")
+    path = os.path.join(root, "Doska")  # прежнее имя папки: тут лежат все доски, не менять
     os.makedirs(path, exist_ok=True)
     return path
 

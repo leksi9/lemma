@@ -11,15 +11,15 @@ if not defined PY (
 )
 echo Ставлю pywebview и pyinstaller...
 %PY% -m pip install --upgrade pywebview pyinstaller || goto :fail
-echo Собираю Doska.exe...
-%PY% -m PyInstaller --noconfirm --clean --windowed --name Doska --icon doska.ico --add-data "app;app" doska.py || goto :fail
+echo Собираю Lemma.exe...
+%PY% -m PyInstaller --noconfirm --clean --windowed --name Lemma --icon lemma.ico --add-data "app;app" doska.py || goto :fail
 echo Кладу страницу доски рядом с exe...
-xcopy /E /I /Y app dist\Doska\app >nul || goto :fail
+xcopy /E /I /Y app dist\Lemma\app >nul || goto :fail
 echo.
-echo Готово: dist\Doska\Doska.exe
+echo Готово: dist\Lemma\Lemma.exe
 echo Больше собирать не нужно. Чтобы обновить доску, замените файл
-echo app\index.html в папке рядом с Doska.exe.
-explorer dist\Doska
+echo app\index.html в папке рядом с Lemma.exe.
+explorer dist\Lemma
 pause
 exit /b 0
 :fail
