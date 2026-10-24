@@ -117,6 +117,13 @@ class Api:
     def app_version(self):
         return VERSION
 
+    def toggle_fullscreen(self):
+        try:
+            webview.windows[0].toggle_fullscreen()
+            return True
+        except Exception:
+            return False
+
     def check_update(self):
         """Спрашиваем GitHub о последней версии. Ничего не скачиваем."""
         if not VERSION or not getattr(sys, "frozen", False):
