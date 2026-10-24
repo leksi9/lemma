@@ -12,6 +12,8 @@ import tempfile
 import threading
 import time
 import urllib.request
+import http.server
+import functools
 import hashlib
 import shutil
 import inspect
@@ -212,12 +214,47 @@ class Api:
         return os.path.basename(path)
 
 
+class _Handler(http.server.SimpleHTTPRequestHandler):
+    """Отдаёт страницу доски. HTML не кэшируется, файлы версии (в папке с её отпечатком) кэшируются навсегда."""
+
+    def end_headers(self):
+        if self.path.split("?")[0].endswith((".html", "/")):
+            self.send_header("Cache-Control", "no-store, max-age=0")
+        else:
+            self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+        super().end_headers()
+
+    def log_message(self, *args):  # без консоли (pythonw) печать падает
+        pass
+
+
+def serve(root):
+    """Свой маленький сервер на прежнем адресе 127.0.0.1:PORT — так доски остаются на месте.
+    Если порт занят (Лемма уже открыта), используем уже работающий сервер."""
+    handler = functools.partial(_Handler, directory=root)
+    try:
+        srv = http.server.ThreadingHTTPServer(("127.0.0.1", PORT), handler)
+    except OSError:
+        return None
+    srv.daemon_threads = True
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
 def main():
     index = fresh_copy(find_index())
+    web = os.path.join(data_dir(), "web")
+    if os.path.dirname(os.path.dirname(index)) == web:
+        serve(web)
+        # адрес содержит отпечаток версии: новая версия = новый адрес, старая копия из кэша не подхватится
+        url = f"http://127.0.0.1:{PORT}/{os.path.basename(os.path.dirname(index))}/index.html"
+        http_server = False
+    else:  # не удалось скопировать страницу — запасной путь, как раньше
+        url, http_server = index, True
     win_kwargs = only_supported(
         webview.create_window,
         title=APP_NAME,
-        url=index,
+        url=url,
         js_api=Api(),
         width=1400,
         height=900,
@@ -233,7 +270,7 @@ def main():
         webview.start,
         private_mode=False,          # иначе доски не сохраняются между запусками
         storage_path=data_dir(),
-        http_server=True,
+        http_server=http_server,
         http_port=PORT,
         debug=("--debug" in sys.argv),
     )
