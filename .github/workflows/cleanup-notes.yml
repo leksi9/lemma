@@ -1,0 +1,24 @@
+name: Убрать ссылку на сессию из описаний версий
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/cleanup-notes.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Почистить описания
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          for id in $(gh api "repos/$REPO/releases?per_page=100" --jq '.[] | select(.body|test("Claude-Session")) | .id'); do
+            body=$(gh api "repos/$REPO/releases/$id" --jq .body | grep -v '^Claude-Session:')
+            gh api -X PATCH "repos/$REPO/releases/$id" -f body="$body" --jq .tag_name
+          done

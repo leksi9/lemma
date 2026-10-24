@@ -3,7 +3,7 @@ name: Сборка установщика
 on:
   push:
     branches: [main]
-    paths-ignore: ['README.md', 'docs/**']
+    paths-ignore: ['README.md', 'docs/**', 'CLAUDE.md', '.github/**']
   workflow_dispatch:
 
 permissions:
@@ -56,11 +56,18 @@ jobs:
           & $iscc "/DAppVersion=$env:VERSION" doska.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
+      - name: Описание версии
+        shell: pwsh
+        env:
+          MSG: ${{ github.event.head_commit.message || 'Обновление Леммы' }}
+        run: |
+          ($env:MSG -split "`n" | Where-Object { $_ -notmatch '^\s*Claude-Session:' }) -join "`n" | Set-Content -Encoding utf8 notes.md
+
       - name: Релиз
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VERSION }}
           name: Лемма ${{ env.VERSION }}
-          body: ${{ github.event.head_commit.message || 'Обновление Леммы' }}
+          body_path: notes.md
           files: Output/Lemma-Setup.exe
           make_latest: true
