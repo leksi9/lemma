@@ -9,10 +9,15 @@ import base64
 import hashlib
 import shutil
 import inspect
+import mimetypes
 import os
 import sys
 
 import webview
+
+mimetypes.add_type("application/wasm", ".wasm")  # иначе Python для блока кода не загрузится
+mimetypes.add_type("application/javascript", ".js")
+mimetypes.add_type("application/json", ".json")
 
 APP_NAME = "Лемма"
 PORT = 47321  # постоянный порт: от него зависит, где браузерный движок хранит доски
@@ -41,10 +46,13 @@ def fresh_copy(index):
         target_dir = os.path.join(web, digest)
         target = os.path.join(target_dir, "index.html")
         if not os.path.isfile(target):
-            os.makedirs(target_dir, exist_ok=True)
-            shutil.copyfile(index, target)
+            tmp = target_dir + ".tmp"
+            shutil.rmtree(tmp, ignore_errors=True)
+            # вся папка app: страница и Python для блока кода (pyodide)
+            shutil.copytree(os.path.dirname(index), tmp)
+            os.replace(tmp, target_dir)
         for name in os.listdir(web):
-            if name != digest:
+            if name != digest and not name.endswith(".tmp"):
                 shutil.rmtree(os.path.join(web, name), ignore_errors=True)
         return target
     except OSError:
@@ -85,6 +93,7 @@ class Api:
         types = {
             ".png": ("Картинка PNG (*.png)",),
             ".doska": ("Файл доски (*.doska)",),
+            ".pdf": ("Документ PDF (*.pdf)",),
         }.get(ext, ("Все файлы (*.*)",))
         kwargs = only_supported(
             win.create_file_dialog,

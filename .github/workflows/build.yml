@@ -27,8 +27,18 @@ jobs:
       - name: Страница доски
         run: python build.py doska.html
 
+      - name: Python для блока кода (Pyodide)
+        shell: pwsh
+        run: |
+          $v = "0.26.4"
+          New-Item -ItemType Directory -Force app/pyodide | Out-Null
+          foreach ($f in "pyodide.js","pyodide.asm.js","pyodide.asm.wasm","python_stdlib.zip","pyodide-lock.json") {
+            Invoke-WebRequest "https://cdn.jsdelivr.net/npm/pyodide@$v/$f" -OutFile "app/pyodide/$f"
+          }
+          Get-ChildItem app/pyodide | Format-Table Name, Length
+
       - name: Lemma.exe
-        run: python -m PyInstaller --noconfirm --clean --windowed --name Lemma --icon lemma.ico --add-data "app;app" doska.py
+        run: python -m PyInstaller --noconfirm --clean --windowed --name Lemma --icon lemma.ico doska.py
 
       - name: Страница рядом с exe
         shell: cmd

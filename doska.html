@@ -1,7 +1,7 @@
 <title>Лемма</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
 <style>
 /* Layout: full-bleed canvas; floating tool rail left, board pill top-left, view controls bottom, panels slide over the canvas */
 :root{
@@ -141,6 +141,51 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .pg .n{position:absolute;left:6px;bottom:6px;font-size:11px;background:rgba(20,24,32,.72);color:#fff;border-radius:5px;padding:1px 6px;font-variant-numeric:tabular-nums}
 .pg.used::after{content:"✓";position:absolute;right:6px;top:6px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:grid;place-items:center}
 .empty{color:var(--muted);font-size:13px;line-height:1.5;padding:16px 4px}
+/* code panel */
+#cpanel{right:max(12px,env(safe-area-inset-right,0px));z-index:22;width:min(400px,calc(100vw - 90px))}
+.cpb{display:flex;flex-direction:column;gap:6px}
+.clbl{font-size:12px;color:var(--muted);margin-top:6px}
+#cCode,#cIn{width:100%;font:13.5px/1.55 "JetBrains Mono",Consolas,monospace;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--fg);resize:vertical;tab-size:4;-webkit-user-select:text;user-select:text}
+#cCode{min-height:220px}
+#cCode:focus,#cIn:focus{outline:none;border-color:var(--accent);background:var(--panel)}
+.crow{display:flex;align-items:center;gap:8px;margin-top:6px}
+.crow .btn{display:flex;align-items:center;gap:6px}
+.crow .btn svg.i{width:16px;height:16px}
+#cStatus{font-size:12px;color:var(--muted)}
+#cOut{margin:6px 0 0;padding:10px 12px;border-radius:9px;background:var(--panel-2);font:13px/1.5 "JetBrains Mono",Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:240px;overflow:auto;-webkit-user-select:text;user-select:text}
+#cOut .cerr{color:var(--danger)}
+.tbtn.run{color:#2a9d5a}
+.codethumb{width:100%;aspect-ratio:4/3;border-radius:8px;background:#1b1f27;display:flex;flex-direction:column;justify-content:center;padding:0 14%;gap:4px;font:600 13px "JetBrains Mono",Consolas,monospace;color:#c792ea;text-align:left}
+.codethumb b{color:#ffd43b;font-size:16px}.codethumb i{font-style:normal;color:#a5d6a7;font-weight:400}
+/* templates */
+.litem.tpl{position:relative;padding:6px 6px 8px}
+.tplins{display:block;width:100%;border-radius:7px;overflow:hidden;background:var(--panel-2)}
+.tplins img{width:100%;aspect-ratio:16/10;object-fit:contain;display:block}
+.litem.tpl .tn{font-size:12px;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;cursor:text}
+.tdel{position:absolute;right:8px;top:8px;width:24px;height:24px;border-radius:50%;background:var(--panel);box-shadow:var(--shadow);font-size:16px;line-height:1;opacity:0;color:var(--muted)}
+.litem.tpl:hover .tdel,.tdel:focus-visible{opacity:1}
+.tdel:hover{color:var(--danger)}
+.tplconfirm{position:absolute;inset:0;border-radius:10px;background:color-mix(in srgb,var(--panel) 94%,transparent);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:8px;padding:8px;font-size:12px;text-align:center}
+.tplconfirm div{display:flex;gap:6px}.tplconfirm .btn{padding:5px 10px;font-size:12px}
+.tren{width:100%;font:12px var(--ui);padding:3px 6px;border:1px solid var(--accent);border-radius:6px;background:var(--panel);color:var(--fg)}
+.tplempty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:28px 8px;color:var(--muted);font-size:13px;line-height:1.5}
+.tplempty>svg.i{width:34px;height:34px;color:var(--accent);stroke-width:1.4}
+.tplempty b{color:var(--fg);font-weight:500;font-size:14px}
+.kbd{display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:6px;background:var(--panel-2);color:var(--fg);white-space:nowrap}
+.kbd svg.i{width:14px;height:14px}
+.tplprev{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--panel-2)}
+.tplprev img{display:block;width:100%;aspect-ratio:16/10;object-fit:contain}
+/* pdf dialog */
+.seg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg2 label{position:relative;cursor:pointer}
+.seg2 input{position:absolute;opacity:0;pointer-events:none}
+.seg2 span{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2);color:var(--fg);font-size:14px;transition:border-color .15s,background .15s}
+.seg2 small{font-size:12px;color:var(--muted)}
+.seg2 input:checked+span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.seg2 input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+#cpanel{animation:slideR .22s var(--ease)}#cpanel.leaving{animation:slideROut .16s ease-in forwards}
 /* graph panel */
 #gpanel{right:max(12px,env(safe-area-inset-right,0px));z-index:22;width:min(330px,calc(100vw - 90px))}
 .frows{display:flex;flex-direction:column}
@@ -332,6 +377,8 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
  <symbol id="i-rot" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></symbol>
  <symbol id="i-flipH" viewBox="0 0 24 24"><path d="M12 3v18" stroke-dasharray="2 2.5"/><path d="M9 6L3 18h6z"/><path d="M15 6l6 12h-6z" fill="currentColor" fill-opacity=".2"/></symbol>
  <symbol id="i-flipV" viewBox="0 0 24 24"><path d="M3 12h18" stroke-dasharray="2 2.5"/><path d="M6 9L18 3v6z"/><path d="M6 15l12 6v-6z" fill="currentColor" fill-opacity=".2"/></symbol>
+ <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M6.5 3.5h11a1 1 0 011 1v16l-6.5-4-6.5 4v-16a1 1 0 011-1z"/><path d="M12 7.5v5M9.5 10h5"/></symbol>
+ <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.8v14.4a.8.8 0 001.2.7l11.3-7.2a.8.8 0 000-1.4L8.2 4.1A.8.8 0 007 4.8z" fill="currentColor" stroke="none"/></symbol>
  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
 </svg>
 
@@ -391,6 +438,18 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
   <div class="pb"><div class="pages" id="pdfPages"></div></div>
 </aside>
 
+<aside id="cpanel" class="float panel" hidden aria-label="Код Python">
+  <div class="ph"><h2>Python</h2><button class="ib" id="cclose" title="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="pb cpb">
+    <label class="clbl" for="cCode">Код</label>
+    <textarea id="cCode" spellcheck="false" autocomplete="off" wrap="off"></textarea>
+    <span class="hint">Ctrl+Enter — запустить. Tab — отступ.</span>
+    <label class="clbl" for="cIn">Данные для input() — по одному значению в строке</label>
+    <textarea id="cIn" spellcheck="false" autocomplete="off" rows="3"></textarea>
+    <div class="crow"><button class="btn pri" id="cRun"><svg class="i"><use href="#i-play"/></svg>Запустить</button><button class="btn dng" id="cStop" hidden>Остановить</button><span id="cStatus"></span></div>
+    <pre id="cOut" hidden></pre>
+  </div>
+</aside>
 <aside id="gpanel" class="float panel" hidden aria-label="Функции на плоскости">
   <div class="ph"><h2>Функции</h2><button class="ib" id="gclose" title="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div>
   <div class="pb" id="gbody"></div>
@@ -501,16 +560,18 @@ function hitStroke(o,x,y,tol){const p=o.pts,n=p.length/3;const r=(o.hl?o.size:(o
   for(let i=1;i<n;i++){if(distSeg(x,y,p[(i-1)*3],p[(i-1)*3+1],p[i*3],p[i*3+1])<=r)return true;}return false;}
 
 /* ============ shapes ============ */
-function shapeBB(o){const m=o.size/2+(o.kind==='arrow'?o.size*3+6:2);const x=Math.min(o.x1,o.x2),y=Math.min(o.y1,o.y2);return {x:x-m,y:y-m,w:Math.abs(o.x2-o.x1)+2*m,h:Math.abs(o.y2-o.y1)+2*m};}
+function shapeBB(o){const m=o.size/2+(o.kind==='arrow'?o.size*3+6:2);if(o.kind==='poly'){const p=polyShape(o.pts);return {x:p.x1-m,y:p.y1-m,w:p.x2-p.x1+2*m,h:p.y2-p.y1+2*m};}const x=Math.min(o.x1,o.x2),y=Math.min(o.y1,o.y2);return {x:x-m,y:y-m,w:Math.abs(o.x2-o.x1)+2*m,h:Math.abs(o.y2-o.y1)+2*m};}
 function arrowHead(ctx,x1,y1,x2,y2,s){const a=Math.atan2(y2-y1,x2-x1);const L=Math.max(10,s*4);ctx.beginPath();ctx.moveTo(x2-L*Math.cos(a-0.42),y2-L*Math.sin(a-0.42));ctx.lineTo(x2,y2);ctx.lineTo(x2-L*Math.cos(a+0.42),y2-L*Math.sin(a+0.42));ctx.stroke();}
 function drawShape(ctx,o){ctx.strokeStyle=col(o.color);ctx.lineWidth=o.size;ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash(o.dash?[o.size*3+4,o.size*2+5]:[]);
   const {x1,y1,x2,y2}=o;ctx.beginPath();
   if(o.kind==='line'||o.kind==='arrow'){ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.setLineDash([]);if(o.kind==='arrow')arrowHead(ctx,x1,y1,x2,y2,o.size);}
   else if(o.kind==='rect'){ctx.rect(Math.min(x1,x2),Math.min(y1,y2),Math.abs(x2-x1),Math.abs(y2-y1));ctx.stroke();}
+  else if(o.kind==='poly'){const p=o.pts;ctx.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)ctx.lineTo(p[i],p[i+1]);ctx.closePath();ctx.stroke();}
   else if(o.kind==='ellipse'){ctx.ellipse((x1+x2)/2,(y1+y2)/2,Math.abs(x2-x1)/2,Math.abs(y2-y1)/2,0,0,Math.PI*2);ctx.stroke();}
   ctx.setLineDash([]);}
 function hitShape(o,x,y,tol){const t=o.size/2+tol;const {x1,y1,x2,y2}=o;
   if(o.kind==='line'||o.kind==='arrow')return distSeg(x,y,x1,y1,x2,y2)<=t;
+  if(o.kind==='poly'){const p=o.pts,n=p.length;for(let i=0;i<n;i+=2){const j=(i+2)%n;if(distSeg(x,y,p[i],p[i+1],p[j],p[j+1])<=t)return true;}return false;}
   if(o.kind==='rect'){const a=Math.min(x1,x2),b=Math.min(y1,y2),c=Math.max(x1,x2),d=Math.max(y1,y2);return distSeg(x,y,a,b,c,b)<=t||distSeg(x,y,c,b,c,d)<=t||distSeg(x,y,c,d,a,d)<=t||distSeg(x,y,a,d,a,b)<=t;}
   const cx=(x1+x2)/2,cy=(y1+y2)/2,rx=Math.abs(x2-x1)/2||1,ry=Math.abs(y2-y1)/2||1;const v=Math.hypot((x-cx)/rx,(y-cy)/ry);return Math.abs(v-1)*Math.min(rx,ry)<=t;}
 
@@ -715,7 +776,7 @@ const FIGS={
 };
 function sizeTables(){for(const k in FIGS){const f=FIGS[k];if(f.table){delete TB[f.table]._cols;const [w,h]=tsize(TB[f.table]);f.w=w;f.h=h;f.draw=(c,w,h,o)=>drawTable(c,w,h,o,TB[f.table]);}}}
 sizeTables();
-const GROUPS=[['plan','Планиметрия'],['stereo','Стереометрия'],['coord','Графики'],['tab','Таблицы'],['inf','Информатика'],['phys','Физика']];
+const GROUPS=[['mine','Мои заготовки'],['plan','Планиметрия'],['stereo','Стереометрия'],['coord','Графики'],['tab','Таблицы'],['inf','Информатика'],['phys','Физика']];
 
 /* orientation: displayed box o.x,o.y,o.w,o.h; inner drawing is rotated by rot·90° and mirrored by fx/fy */
 function orient(ctx,o){const rot=((o.rot|0)%4+4)%4,fx=o.fx===-1?-1:1,fy=o.fy===-1?-1:1;const iw=rot%2?o.h:o.w,ih=rot%2?o.w:o.h;
@@ -730,23 +791,25 @@ const LABELABLE=new Set(['plan','stereo']);
 
 /* ============ generic object ops ============ */
 function rotBB(b,a){if(!a)return b;const cx=b.x+b.w/2,cy=b.y+b.h/2,c=Math.abs(Math.cos(a)),s=Math.abs(Math.sin(a));const w=b.w*c+b.h*s,h=b.w*s+b.h*c;return {x:cx-w/2,y:cy-h/2,w,h};}
-function rawBox(o){switch(o.type){case 'text':return textBB(o);case 'fig':{const m=FIGS[o.kind]&&!FIGS[o.kind].table?22:2;return {x:o.x-m,y:o.y-m,w:o.w+2*m,h:o.h+2*m};}case 'image':return {x:o.x,y:o.y,w:o.w,h:o.h};case 'shape':return shapeBB(o);default:return o.bb;}}
+function rawBox(o){switch(o.type){case 'text':return textBB(o);case 'fig':{const m=FIGS[o.kind]&&!FIGS[o.kind].table?22:2;return {x:o.x-m,y:o.y-m,w:o.w+2*m,h:o.h+2*m};}case 'image':return {x:o.x,y:o.y,w:o.w,h:o.h};case 'shape':return shapeBB(o);case 'code':return {x:o.x,y:o.y,w:o.w,h:codeLayout(o).h};default:return o.bb;}}
 function boxShape(o){return o.type==='shape'&&(o.kind==='rect'||o.kind==='ellipse');}
 function hasAng(o){return !!o.ang&&(o.type==='fig'||o.type==='image'||o.type==='text'||boxShape(o));}
 function bounds(o){if(o.type==='stroke')return o.bb;const b=rawBox(o);return hasAng(o)?rotBB(b,o.ang):b;}
-function centerOf(o){if(o.type==='shape')return [(o.x1+o.x2)/2,(o.y1+o.y2)/2];if(o.type==='text'){const b=textBB(o);return [b.x+b.w/2,b.y+b.h/2];}return [o.x+o.w/2,o.y+o.h/2];}
+function centerOf(o){if(o.type==='code'){const b=rawBox(o);return [b.x+b.w/2,b.y+b.h/2];}if(o.type==='shape')return [(o.x1+o.x2)/2,(o.y1+o.y2)/2];if(o.type==='text'){const b=textBB(o);return [b.x+b.w/2,b.y+b.h/2];}return [o.x+o.w/2,o.y+o.h/2];}
 function unrot(o,x,y){const [cx,cy]=centerOf(o),c=Math.cos(-o.ang),s=Math.sin(-o.ang);return [cx+(x-cx)*c-(y-cy)*s,cy+(x-cx)*s+(y-cy)*c];}
 function withAng(ctx,o,fn){if(!hasAng(o))return fn();const [cx,cy]=centerOf(o);ctx.save();ctx.translate(cx,cy);ctx.rotate(o.ang);ctx.translate(-cx,-cy);fn();ctx.restore();}
 function normAng(a){a=((a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;return Math.abs(a)<1e-6?0:a;}
 function rotateObj(o,d,cx,cy){const c=Math.cos(d),s=Math.sin(d);const f=(x,y)=>[cx+(x-cx)*c-(y-cy)*s,cy+(x-cx)*s+(y-cy)*c];
   if(o.type==='stroke'||(o.type==='shape'&&!boxShape(o)))return transformObj(o,f,1,1);
+  if(o.type==='code'){const [ox,oy]=centerOf(o),[nx,ny]=f(ox,oy);return Object.assign({},o,{x:o.x+nx-ox,y:o.y+ny-oy});}
   const [ox,oy]=centerOf(o),[nx,ny]=f(ox,oy),dx=nx-ox,dy=ny-oy,n=Object.assign({},o,{ang:normAng((o.ang||0)+d)});
   if(o.type==='shape'){n.x1+=dx;n.x2+=dx;n.y1+=dy;n.y2+=dy;}else{n.x+=dx;n.y+=dy;}return n;}
-function drawObj(ctx,o){switch(o.type){case 'stroke':drawStroke(ctx,o);break;case 'shape':withAng(ctx,o,()=>drawShape(ctx,o));break;case 'text':withAng(ctx,o,()=>drawText(ctx,o));break;case 'image':drawImage(ctx,o);break;case 'fig':drawFig(ctx,o);break;}}
+function drawObj(ctx,o){switch(o.type){case 'stroke':drawStroke(ctx,o);break;case 'shape':withAng(ctx,o,()=>drawShape(ctx,o));break;case 'text':withAng(ctx,o,()=>drawText(ctx,o));break;case 'image':drawImage(ctx,o);break;case 'fig':drawFig(ctx,o);break;case 'code':drawCode(ctx,o);break;}}
 function hitObj(o,x,y,tol){const b=bounds(o);if(x<b.x-tol||x>b.x+b.w+tol||y<b.y-tol||y>b.y+b.h+tol)return false;if(hasAng(o)){[x,y]=unrot(o,x,y);const r=rawBox(o);if(o.type!=='shape')return x>=r.x-tol&&x<=r.x+r.w+tol&&y>=r.y-tol&&y<=r.y+r.h+tol;}if(o.type==='stroke')return hitStroke(o,x,y,tol);if(o.type==='shape')return hitShape(o,x,y,tol);return true;}
 function transformObj(o,f,sx,sy){const n=Object.assign({},o);
   if(o.type==='stroke'){const p=o.pts.slice();for(let i=0;i<p.length;i+=3){const q=f(p[i],p[i+1]);p[i]=q[0];p[i+1]=q[1];}n.pts=p;if(sx!==1||sy!==1)n.size=o.size*Math.sqrt(Math.abs(sx*sy));n.bb=strokeBB(n);}
-  else if(o.type==='shape'){[n.x1,n.y1]=f(o.x1,o.y1);[n.x2,n.y2]=f(o.x2,o.y2);}
+  else if(o.type==='shape'){[n.x1,n.y1]=f(o.x1,o.y1);[n.x2,n.y2]=f(o.x2,o.y2);if(o.pts){const p=[];for(let i=0;i<o.pts.length;i+=2)p.push(...f(o.pts[i],o.pts[i+1]));Object.assign(n,polyShape(p),{kind:o.kind});}}
+  else if(o.type==='code'){[n.x,n.y]=f(o.x,o.y);n.size=Math.max(6,(o.size||15)*Math.abs(sy));n.w=Math.max(80,o.w*Math.abs(sx));}
   else if(o.type==='text'){[n.x,n.y]=f(o.x,o.y);n.size=Math.max(6,o.size*Math.abs(sy));}
   else{const a=f(o.x,o.y),b=f(o.x+o.w,o.y+o.h);n.x=Math.min(a[0],b[0]);n.y=Math.min(a[1],b[1]);n.w=Math.max(8,Math.abs(b[0]-a[0]));n.h=Math.max(8,Math.abs(b[1]-a[1]));}
   return n;}
@@ -785,7 +848,9 @@ let shapePrev=null, marquee=null, hover=null;
 const laser=[];
 function renderOver(){const ctx=octx;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);const z=view.z;
   ctx.save();ctx.setTransform(DPR*z,0,0,DPR*z,-view.x*z*DPR,-view.y*z*DPR);
-  if(live&&live.pts.length){const o={pts:live.pts,color:live.opt.color,size:live.opt.size,pr:live.opt.pr,hl:live.opt.hl};drawStroke(ctx,o);}
+  if(live&&live.shape){const k=clamp((performance.now()-live.flash)/220,0,1);if(k<1){ctx.save();ctx.globalAlpha=(1-k)*.35;drawStroke(ctx,{pts:live.pts,color:live.opt.color,size:live.opt.size,pr:live.opt.pr});ctx.restore();needOver=true;}
+    drawShape(ctx,live.shape);}
+  else if(live&&live.pts.length){const o={pts:live.pts,color:live.opt.color,size:live.opt.size,pr:live.opt.pr,hl:live.opt.hl};drawStroke(ctx,o);}
   if(shapePrev)drawShape(ctx,shapePrev);
   ctx.restore();
   // selection
@@ -819,22 +884,23 @@ function setSel(ids){selection=new Set(ids);dirtyAll();buildSelbar();}
 function positionSelbar(){const bar=$('#selbar');if(!selection.size||drag||editingId){bar.hidden=true;return;}const b=selBB();if(!b){bar.hidden=true;return;}
   const [x1,y1]=toScreen(b.x,b.y),[x2]=toScreen(b.x+b.w,b.y);bar.hidden=false;const bw=bar.offsetWidth;
   let cx=clamp((x1+x2)/2,bw/2+8,W-bw/2-8),cy=y1-12;if(cy<70){const [,y2]=toScreen(b.x,b.y+b.h);cy=Math.min(H-70,y2+12+bar.offsetHeight);}bar.style.left=cx+'px';bar.style.top=cy+'px';}
-function buildSelbar(){_buildSelbar();syncGraphPanel();}
+function buildSelbar(){_buildSelbar();syncGraphPanel();syncCodePanel();}
 function _buildSelbar(){const bar=$('#selbar');const objs=selObjs();if(!objs.length){bar.hidden=true;return;}
   const colorable=objs.some(o=>o.type!=='image');const hlOnly=objs.every(o=>o.hl);
   let h='';if(colorable){const pal=hlOnly?Object.keys(HL):Object.keys(PAL);const cur=objs[0].color;h+=pal.map(c=>`<button class="sw${cur===c?' on':''}" data-c="${c}" title="Цвет"><i style="background:${col(c)}"></i></button>`).join('')+'<span class="sep" style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>';}
   const one=objs.length===1?objs[0]:null;
   const labFigs=objs.filter(o=>o.type==='fig'&&FIGS[o.kind]&&LABELABLE.has(FIGS[o.kind].g));
+  if(one&&one.type==='code')h+=`<button class="tbtn run" data-a="run" title="Запустить (Ctrl+Enter)"><svg class="i"><use href="#i-play"/></svg></button><span class="sep" style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>`;
   if(labFigs.length)h+=`<button class="tbtn${labFigs.every(o=>o.labels)?' on':''}" data-a="labels" title="Подписи вершин" style="font:italic 16px var(--math)">AB</button>`;
   if(one&&isGraph(one))h+=`<button class="tbtn" data-a="edit" title="Функции на плоскости"><svg class="i"><use href="#i-edit"/></svg></button>`;
   if(one&&one.type==='text')h+=`<button class="tbtn" data-a="edittext" title="Редактировать текст"><svg class="i"><use href="#i-edit"/></svg></button>`;
   if(objs.some(o=>o.type!=='text'))h+=`<button class="tbtn" data-a="flipH" title="Отразить слева направо (Shift+H)"><svg class="i"><use href="#i-flipH"/></svg></button><button class="tbtn" data-a="flipV" title="Отразить сверху вниз (Shift+V)"><svg class="i"><use href="#i-flipV"/></svg></button><span class="sep" style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>`;
-  h+=`<button class="tbtn" data-a="dup" title="Дублировать (Ctrl+D)"><svg class="i"><use href="#i-copy"/></svg></button><button class="tbtn" data-a="front" title="На передний план"><svg class="i"><use href="#i-front"/></svg></button><button class="tbtn" data-a="back" title="На задний план"><svg class="i"><use href="#i-back"/></svg></button><button class="tbtn del" data-a="del" title="Удалить (Delete)"><svg class="i"><use href="#i-trash"/></svg></button>`;
+  h+=`<button class="tbtn" data-a="tpl" title="Сохранить в заготовки"><svg class="i"><use href="#i-bookmark"/></svg></button><button class="tbtn" data-a="dup" title="Дублировать (Ctrl+D)"><svg class="i"><use href="#i-copy"/></svg></button><button class="tbtn" data-a="front" title="На передний план"><svg class="i"><use href="#i-front"/></svg></button><button class="tbtn" data-a="back" title="На задний план"><svg class="i"><use href="#i-back"/></svg></button><button class="tbtn del" data-a="del" title="Удалить (Delete)"><svg class="i"><use href="#i-trash"/></svg></button>`;
   bar.innerHTML=h;needBase=true;}
 $('#selbar').addEventListener('pointerdown',e=>e.stopPropagation());
 $('#selbar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
   if(b.dataset.c){const m=new Map();for(const o of selObjs()){if(o.type==='image')continue;m.set(o.id,Object.assign({},o,{color:b.dataset.c}));}replaceObjs(m);commit();buildSelbar();return;}
-  const a=b.dataset.a;if(a==='rot'){turnSel('rot');return;}if(a==='flipH'||a==='flipV'){turnSel(a);return;}if(a==='del')deleteSel();else if(a==='dup')duplicateSel();else if(a==='front'||a==='back'){const s=selObjs(),r=objects.filter(o=>!selection.has(o.id));objects=a==='front'?[...r,...s]:[...s,...r];commit();}
+  const a=b.dataset.a;if(a==='rot'){turnSel('rot');return;}if(a==='flipH'||a==='flipV'){turnSel(a);return;}if(a==='run'){runPython(selObjs()[0].id);return;}if(a==='tpl'){openTemplateDlg();return;}if(a==='del')deleteSel();else if(a==='dup')duplicateSel();else if(a==='front'||a==='back'){const s=selObjs(),r=objects.filter(o=>!selection.has(o.id));objects=a==='front'?[...r,...s]:[...s,...r];commit();}
   else if(a==='edit'){openGraphPanel(selObjs()[0].id,true);}else if(a==='labels'){const lf=selObjs().filter(o=>o.type==='fig'&&FIGS[o.kind]&&LABELABLE.has(FIGS[o.kind].g));const on=!lf.every(o=>o.labels);replaceObjs(new Map(lf.map(o=>[o.id,Object.assign({},o,{labels:on})])));commit();buildSelbar();}else if(a==='edittext'){editText(selObjs()[0]);}});
 function turnSel(op){const objs=selObjs();if(!objs.length)return;const b=selBB();const cx=b.x+b.w/2,cy=b.y+b.h/2;
   const f=op==='rot'?(x,y)=>[cx-(y-cy),cy+(x-cx)]:op==='flipH'?(x,y)=>[2*cx-x,y]:(x,y)=>[x,2*cy-y];
@@ -891,7 +957,7 @@ function onDown(e){
   const pr=e.pointerType==='pen'&&e.pressure>0&&e.pressure!==.5;
   const now=performance.now();const dbl=now-lastDown.t<350&&Math.hypot(sx-lastDown.x,sy-lastDown.y)<8;lastDown={t:now,x:sx,y:sy};
   if(t==='pen'||t==='marker'){const opt=t==='pen'?{color:S.pen.color,size:S.pen.size,pr:e.pointerType==='pen'}:{color:S.marker.color,size:S.marker.size,pr:false,hl:true};
-    live={pts:[wx,wy,e.pointerType==='pen'?e.pressure||.5:.5],opt,last:[wx,wy],pen:e.pointerType==='pen'};drag={type:'draw',id:e.pointerId};needOver=true;return;}
+    live={pts:[wx,wy,e.pointerType==='pen'?e.pressure||.5:.5],opt,last:[wx,wy],anchor:[wx,wy],pen:e.pointerType==='pen'};drag={type:'draw',id:e.pointerId};needOver=true;return;}
   if(t==='eraser'){drag={type:'erase',id:e.pointerId,gone:new Set(),px:wx,py:wy};eraseAt(wx,wy,wx,wy);hover={x:wx,y:wy,kind:'eraser'};return;}
   if(t==='shape'){drag={type:'shape',id:e.pointerId,x:wx,y:wy};shapePrev={type:'shape',kind:S.shape.kind,dash:S.shape.dash,color:S.shape.color,size:S.shape.size,x1:wx,y1:wy,x2:wx,y2:wy};return;}
   if(t==='text'){const tol=6/view.z;const hitT=[...objects].reverse().find(o=>o.type==='text'&&hitObj(o,wx,wy,tol));if(hitT)editText(hitT);else newText(wx,wy);return;}
@@ -905,6 +971,7 @@ function onDown(e){
     if(hitO){
       if(dbl&&hitO.type==='text'){editText(hitO);return;}
       if(dbl&&isGraph(hitO)){setSel([hitO.id]);openGraphPanel(hitO.id,true);return;}
+      if(dbl&&hitO.type==='code'){setSel([hitO.id]);openCodePanel(hitO.id,true);return;}
       if(e.shiftKey){const s=new Set(selection);s.has(hitO.id)?s.delete(hitO.id):s.add(hitO.id);setSel(s);}
       else if(!selection.has(hitO.id))setSel([hitO.id]);
       drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey};needBase=true;$('#selbar').hidden=true;return;}
@@ -933,11 +1000,13 @@ function onMove(e){
         if(Math.abs(ang-snap)<0.07){ex=x0+len*Math.cos(snap);ey=y0+len*Math.sin(snap);}
         const pr=live.pen?(e.pressure||.5):.5;const n=Math.max(2,Math.ceil(len/5));const pts=[];for(let i=0;i<=n;i++){const t=i/n;pts.push(x0+(ex-x0)*t,y0+(ey-y0)*t,pr);}
         live.pts=pts;live.last=[ex,ey];hover={x:wx,y:wy,kind:tool,size:live.opt.size,color:col(live.opt.color)};needOver=true;break;}
-      const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+      if(live.shape){hover={x:wx,y:wy,kind:tool,size:live.opt.size,color:col(live.opt.color)};needOver=true;break;}
+      const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];let moved=false;
       for(const ev of evs.length?evs:[e]){const [x,y]=evPos(ev);let [px,py]=toWorld(x,y);const L=live.last;
         if(live.pen){const k=.55;px=L[0]+(px-L[0])*k;py=L[1]+(py-L[1])*k;}
         if(Math.hypot((px-L[0])*view.z,(py-L[1])*view.z)<.9)continue;
-        live.pts.push(px,py,live.pen?(ev.pressure||.5):.5);live.last=[px,py];}
+        live.pts.push(px,py,live.pen?(ev.pressure||.5):.5);live.last=[px,py];if(Math.hypot((px-live.anchor[0])*view.z,(py-live.anchor[1])*view.z)>3){live.anchor=[px,py];moved=true;}}
+      if(moved&&S.recognize!==false){clearTimeout(live.holdT);live.holdT=setTimeout(holdCheck,520);}
       hover={x:wx,y:wy,kind:tool,size:live.opt.size,color:col(live.opt.color)};needOver=true;break;}
     case 'erase':{eraseAt(drag.px,drag.py,wx,wy);drag.px=wx;drag.py=wy;hover={x:wx,y:wy,kind:'eraser'};needOver=true;break;}
     case 'shape':{let x=wx,y=wy;const s=shapePrev;
@@ -951,7 +1020,7 @@ function onMove(e){
       let deg=Math.round(normAng(fin)*180/Math.PI);if(deg===-180)deg=180;drag.label=(deg>0?'+':deg<0?'−':'')+Math.abs(deg)+'°';drag.lp=[sx,sy];needBase=true;needOver=true;break;}
     case 'scale':{const b=drag.b,c=drag.corner;const ax=c.includes('w')?b.x+b.w:b.x,ay=c.includes('n')?b.y+b.h:b.y;
       let sxk=(wx-ax)/((c.includes('w')?b.x:b.x+b.w)-ax),syk=(wy-ay)/((c.includes('n')?b.y:b.y+b.h)-ay);
-      const uni=e.shiftKey!==drag.orig.some(o=>o.type==='image'||o.type==='text'||(o.type==='fig'&&FIGS[o.kind]&&FIGS[o.kind].uni));
+      const uni=e.shiftKey!==drag.orig.some(o=>o.type==='image'||o.type==='text'||o.type==='code'||(o.type==='fig'&&FIGS[o.kind]&&FIGS[o.kind].uni));
       if(uni){const k=Math.max(sxk,syk);sxk=syk=k;}sxk=Math.max(.05,sxk);syk=Math.max(.05,syk);
       const f=(x,y)=>[ax+(x-ax)*sxk,ay+(y-ay)*syk];const m=new Map();for(const o of drag.orig)m.set(o.id,transformObj(o,f,sxk,syk));drag.preview=m;drag.f=[sxk,syk];needBase=true;needOver=true;break;}
     case 'marquee':marquee.x2=wx;marquee.y2=wy;{const r={x:Math.min(marquee.x1,wx),y:Math.min(marquee.y1,wy),w:Math.abs(wx-marquee.x1),h:Math.abs(wy-marquee.y1)};selection=new Set(objects.filter(o=>inter(bounds(o),r)).map(o=>o.id));}needOver=true;break;
@@ -966,7 +1035,8 @@ function onUp(e){
   const d=drag;drag=null;
   switch(d.type){
     case 'pan':updateCursor();break;
-    case 'draw':{if(live&&live.pts.length){if(live.pen&&!live.straight){const [x,y]=toWorld(...evPos(e));const L=live.last;if(Math.hypot(x-L[0],y-L[1])*view.z>.6)live.pts.push(x,y,live.pts[live.pts.length-1]);}
+    case 'draw':{if(live)clearTimeout(live.holdT);if(live&&live.shape){const sh=Object.assign({},live.shape,{id:uid()});objects=[...objects,sh];commit();live=null;needOver=true;break;}
+      if(live&&live.pts.length){if(live.pen&&!live.straight){const [x,y]=toWorld(...evPos(e));const L=live.last;if(Math.hypot(x-L[0],y-L[1])*view.z>.6)live.pts.push(x,y,live.pts[live.pts.length-1]);}
       objects=[...objects,makeStroke(live.pts,live.opt)];commit();}live=null;needOver=true;break;}
     case 'erase':if(d.gone.size){objects=objects.filter(o=>!d.gone.has(o.id));commit();}else dirtyAll();if(tool!=='eraser')hover=null;break;
     case 'shape':{const s=shapePrev;shapePrev=null;if(Math.hypot(s.x2-s.x1,s.y2-s.y1)*view.z>4){s.id=uid();objects=[...objects,s];commit();}needOver=true;break;}
@@ -1011,7 +1081,7 @@ window.addEventListener('keydown',e=>{
   if(e.shiftKey&&e.code==='Digit1'){fitAll();return;}
   if(e.shiftKey&&selection.size&&(e.code==='KeyR'||e.code==='KeyH'||e.code==='KeyV')){e.preventDefault();turnSel(e.code==='KeyR'?'rot':e.code==='KeyH'?'flipH':'flipV');return;}
   if(e.code==='Delete'||e.code==='Backspace'){deleteSel();return;}
-  if(e.code==='Escape'){setSel([]);closePanels();closeMenu();hideGraphPanel();return;}
+  if(e.code==='Escape'){setSel([]);closePanels();closeMenu();hideGraphPanel();hideCodePanel();return;}
   if(e.code==='KeyG'){toggleLib();return;}
   if(KEYS[e.code])setTool(KEYS[e.code]);
   const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
@@ -1064,16 +1134,25 @@ $('#libBtn').onclick=toggleLib;
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>{if(b.dataset.close==='lib')closePanels();else hideAnim($('#pdf'),160);});
 $('#libTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;libTab=b.dataset.g;renderLib();});
 function renderLib(){$('#libTabs').innerHTML=GROUPS.map(([g,n])=>`<button class="${g===libTab?'on':''}" data-g="${g}">${n}</button>`).join('');
+  if(libTab==='mine'){$('#libBody').innerHTML=renderTemplates();return;}
   const items=Object.entries(FIGS).filter(([,f])=>f.g===libTab);
-  let h='<div class="lgrid">'+items.map(([k,f])=>`<button class="litem" data-k="${k}"><canvas width="240" height="180" data-thumb="${k}"></canvas><span>${f.name}</span></button>`).join('')+'</div>';
+  let h='<div class="lgrid">'+(libTab==='inf'?`<button class="litem" data-k="__code"><span class="codethumb"><b>›_</b><i>print(</i><i>&nbsp;&nbsp;sum(…))</i></span><span>Код Python</span></button>`:'')+items.map(([k,f])=>`<button class="litem" data-k="${k}"><canvas width="240" height="180" data-thumb="${k}"></canvas><span>${f.name}</span></button>`).join('')+'</div>';
   if(libTab==='coord')h+='<p class="empty">Вставьте плоскость и выделите её — справа откроется список функций. Формулы можно менять прямо во время урока, график перерисовывается сразу.</p>';
   if(libTab==='plan'||libTab==='stereo')h+='<p class="empty">Фигуры вставляются без подписей. Чтобы показать вершины A, B, C…, выделите фигуру и нажмите «AB». Пунктир — невидимые рёбра.</p>';
   $('#libBody').innerHTML=h;renderLibThumbs();}
 function renderLibThumbs(){document.querySelectorAll('canvas[data-thumb]').forEach(cv=>{const f=FIGS[cv.dataset.thumb];const c=cv.getContext('2d');c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,240,180);
   const pad=26;const k=Math.min((240-2*pad)/f.w,(180-2*pad)/f.h);c.translate((240-f.w*k)/2,(180-f.h*k)/2);c.scale(k,k);
   drawFig(c,{type:'fig',kind:cv.dataset.thumb,x:0,y:0,w:f.w,h:f.h,color:T.uiFg||'#1c212b',lw:2.2/k,params:f.params});});}
-$('#libBody').addEventListener('click',e=>{const b=e.target.closest('.litem');if(!b)return;const k=b.dataset.k;
-  insertFig(k);});
+$('#libBody').addEventListener('click',async e=>{
+  const ti=e.target.closest('[data-ti]');if(ti){insertTemplate(ti.dataset.ti);return;}
+  const td=e.target.closest('[data-td]');if(td){const card=td.closest('.tpl');card.classList.add('confirm');card.insertAdjacentHTML('beforeend',`<div class="tplconfirm"><span>Удалить «${esc(templates.find(t=>t.id===td.dataset.td)?.name||'')}»?</span><div><button class="btn dng" data-tdy="${td.dataset.td}">Удалить</button><button class="btn" data-tdn>Отмена</button></div></div>`);return;}
+  const ty=e.target.closest('[data-tdy]');if(ty){await deleteTemplate(ty.dataset.tdy);return;}
+  if(e.target.closest('[data-tdn]')){renderLib();return;}
+  const b=e.target.closest('.litem[data-k]');if(!b)return;const k=b.dataset.k;
+  if(k==='__code'){newCodeBlock();return;}insertFig(k);});
+$('#libBody').addEventListener('dblclick',e=>{const tr=e.target.closest('[data-tr]');if(!tr)return;const id=tr.dataset.tr;const t=templates.find(x=>x.id===id);if(!t)return;
+  tr.outerHTML=`<input class="tren" value="${esc(t.name)}" maxlength="60" aria-label="Название заготовки">`;const inp=$('#libBody .tren');inp.focus();inp.select();let done=false;
+  const fin=async ok=>{if(done)return;done=true;if(ok)await renameTemplate(id,inp.value);renderLib();};inp.addEventListener('keydown',ev=>{ev.stopPropagation();if(ev.key==='Enter')fin(true);if(ev.key==='Escape')fin(false);});inp.addEventListener('blur',()=>fin(true));});
 function insertFig(k,params){const f=FIGS[k];const [cx,cy]=toWorld(W/2,H/2);const o={id:uid(),type:'fig',kind:f.as||k,x:cx-f.w/2,y:cy-f.h/2,w:f.w,h:f.h,color:'ink',params:params||(f.params?JSON.parse(JSON.stringify(f.params)):undefined)};
   objects=[...objects,o];commit();setTool('select');setSel([o.id]);if(isGraph(o)){if(!graphItems(o.params).length)addGraphRow();}return o;}
 /* ---------- live graph panel ---------- */
@@ -1083,7 +1162,8 @@ function syncGraphPanel(){const objs=selObjs();const one=objs.length===1&&isGrap
   if(one){if(gpId!==one.id||$('#gpanel').hidden)openGraphPanel(one.id,false);}else hideGraphPanel();}
 function hideGraphPanel(){flushGraphCommit();gpId=null;hideAnim($('#gpanel'),160);}
 function flushGraphCommit(){if(gCommitT){clearTimeout(gCommitT);gCommitT=null;commit();}}
-function refreshGraphPanel(){if(gpId&&!$('#gpanel').hidden){if(byId(gpId))renderGraphPanel();else hideGraphPanel();}}
+function refreshCodePanel(){if(cpId&&!$('#cpanel').hidden){const o=byId(cpId);if(!o){hideCodePanel();return;}if(document.activeElement!==$('#cCode'))$('#cCode').value=o.code||'';if(document.activeElement!==$('#cIn'))$('#cIn').value=o.inp||'';updateCodePanelRun();}}
+function refreshGraphPanel(){refreshCodePanel();if(gpId&&!$('#gpanel').hidden){if(byId(gpId))renderGraphPanel();else hideGraphPanel();}}
 function openGraphPanel(id,focus){flushGraphCommit();gpId=id;showEl($('#gpanel'));renderGraphPanel();if(focus){const ins=[...document.querySelectorAll('#gbody .fin')];const t=ins.find(i=>!i.value)||ins[ins.length-1];t&&t.focus();}}
 function gParams(o){const p=JSON.parse(JSON.stringify(o.params||{}));p.fns=graphItems(o.params).map((it,i)=>({e:it.e,c:it.c??i,h:!!it.h}));['xmin','xmax','ymin','ymax'].forEach((k,i)=>{if(!isFinite(p[k]))p[k]=[-6,6,-5,5][i];});return p;}
 function updateGraph(mut,live){const o=gpObj();if(!o)return;const p=gParams(o);mut(p);replaceObjs(new Map([[o.id,Object.assign({},o,{params:p})]]));dirtyAll();
@@ -1181,9 +1261,12 @@ $('#moreBtn').onclick=()=>{if(!$('#menu').hidden){closeMenu();return;}
    <div class="lbl">Цвет фона</div><div class="bgrow">${BG_PRESETS.map(([c,n])=>`<button class="sw${(board.bgColor||'#ffffff')===c?' on':''}" data-bgc="${c}" title="${n}"><i style="background:${c}"></i></button>`).join('')}<label class="sw custom" title="Свой цвет"><input type="color" id="bgPick" value="${board.bgColor||'#ffffff'}"><i></i></label></div>
    <button class="toggle${penMode?' on':''}" data-a="pen"><svg class="i"><use href="#i-stylus"/></svg>Только перо<span class="tr"></span></button>
    <div class="confirm" style="padding-top:0">Пальцем двигаете и масштабируете доску, рисует только стилус. Включается сам, когда планшет коснётся доски.</div>
+   <button class="toggle${S.recognize===false?'':' on'}" data-a="recog"><svg class="i"><use href="#i-shapes"/></svg>Распознавать фигуры<span class="tr"></span></button>
+   <div class="confirm" style="padding-top:0">Нарисуйте круг, треугольник или линию и задержите перо в конце на полсекунды — фигура выровняется.</div>
    <button class="toggle${reduceMotion.matches?'':' on'}" data-a="motion"><svg class="i"><use href="#i-laser"/></svg>Анимации<span class="tr"></span></button>
    <hr><button class="mi" data-a="copyimg"><svg class="i"><use href="#i-image"/></svg>Копировать ${selection.size?'выделенное':'доску'} картинкой</button>
    ${window.DOSKA_APP?`<button class="mi" data-a="png"><svg class="i"><use href="#i-image"/></svg>Сохранить ${selection.size?'выделенное':'доску'} в PNG</button>
+   <button class="mi" data-a="pdf"><svg class="i"><use href="#i-file"/></svg>Экспорт в PDF…</button>
    <button class="mi" data-a="export"><svg class="i"><use href="#i-file"/></svg>Сохранить доску в файл</button>
    <button class="mi" data-a="import"><svg class="i"><use href="#i-file"/></svg>Открыть доску из файла</button>`:''}
    <button class="mi" data-a="props"><svg class="i"><use href="#i-edit"/></svg>Свойства доски: дата, ученик, темы</button>
@@ -1196,6 +1279,8 @@ $('#menu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   if(a==='motion'){const on=reduceMotion.matches;setMotion(on);ls.set('motion',on);b.classList.toggle('on',on);return;}
   if(a==='pen'){penMode=!penMode;ls.set('penMode',penMode);updatePenModeUI();b.classList.toggle('on',penMode);return;}
   if(a==='fit'){fitAll();closeMenu();return;}
+  if(a==='pdf'){closeMenu();openPdfDlg();return;}
+  if(a==='recog'){S.recognize=S.recognize===false;ls.set('settings',S);b.classList.toggle('on',S.recognize!==false);return;}
   if(a==='props'){closeMenu();if(board.id){saveNow({fast:true}).then(()=>openPropsDlg(board.id));}return;}
   if(a==='copyimg'){copyAsImage();closeMenu();return;}
   if(a==='png'){renderImageCanvas().then(c=>{if(!c)return toast('На доске пока пусто');c.toBlob(bl=>saveBlob(bl,safeName(board.name)+'.png'),'image/png');});closeMenu();return;}
@@ -1232,7 +1317,7 @@ async function copyAsImage(){const c=await renderImageCanvas();if(!c){toast('Н�
 
 /* ============ boards storage (IndexedDB) ============ */
 let db=null,boardsMeta=[],folders=[];
-function idb(){return new Promise(res=>{try{const r=indexedDB.open('doska',3);r.onupgradeneeded=()=>{const d=r.result;for(const n of ['boards','meta','folders'])if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'});};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null);}catch(e){res(null)}});}
+function idb(){return new Promise(res=>{try{const r=indexedDB.open('doska',4);r.onupgradeneeded=()=>{const d=r.result;for(const n of ['boards','meta','folders','templates'])if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'});};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null);}catch(e){res(null)}});}
 function tx(mode,fn,store='boards'){return new Promise((res,rej)=>{if(!db)return res(null);const t=db.transaction(store,mode);const s=t.objectStore(store);const r=fn(s);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);});}
 function makeThumb(objs,bgc,pattern){const CW=480,CH=300;const c=document.createElement('canvas');c.width=CW;c.height=CH;const x=c.getContext('2d');
   const th=themeFor(bgc||'#ffffff');const saved={};for(const k in th)saved[k]=T[k];Object.assign(T,th);
@@ -1405,6 +1490,8 @@ $('#dlg').addEventListener('click',e=>{if(e.target.id==='dlg'||e.target.closest(
   if(e.target.id==='dTags')$('#dTagIn').focus();});
 $('#dlgBox').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')closeDlg();});
 $('#dlgBox').addEventListener('submit',async e=>{e.preventDefault();const st=dlgState;if(!st)return;
+  if(st.kind==='tpl'){const n=$('#dTpl').value;closeDlg();await saveTemplate(n);return;}
+  if(st.kind==='pdf'){const what=document.querySelector('input[name=pWhat]:checked'),mode=document.querySelector('input[name=pMode]:checked').value,grid=$('#pGrid').checked;closeDlg();toast('Готовлю PDF…');try{const n=await exportPDF({sel:what&&what.value==='sel',mode,pattern:grid});if(n)toast(n===1?'PDF готов: 1 страница':'PDF готов: '+n+' '+plural(n,['страница','страницы','страниц']));}catch(err){toast('Не получилось сделать PDF');}return;}
   if(st.kind==='folder'){const n=$('#dFolder').value.trim();if(!n){$('#dFolder').focus();return;}const f=await createFolder(n);closeDlg();galFolder=f.id;renderGallery();return;}
   if($('#dTagIn').value.trim())addTag($('#dTagIn').value);
   let folder=$('#dFolderSel').value||null;
@@ -1415,6 +1502,200 @@ $('#dlgBox').addEventListener('submit',async e=>{e.preventDefault();const st=dlg
   else{await updateBoardProps(st.id,props);if(!$('#gallery').hidden)renderGallery();toast('Свойства сохранены');}});
 $('#boardBtn').onclick=openGallery;
 $('#logo').onclick=openGallery;
+
+/* ============ shape recognition (hold the pen still at the end of a stroke) ============ */
+function recognizeStroke(raw){const P=[];for(let i=0;i<raw.length;i+=3)P.push([raw[i],raw[i+1]]);if(P.length<8)return null;
+  let len=0;for(let i=1;i<P.length;i++)len+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);
+  let x1=Infinity,y1=Infinity,x2=-Infinity,y2=-Infinity;for(const [x,y] of P){x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y);}
+  const D=Math.hypot(x2-x1,y2-y1);if(D*view.z<24)return null;
+  const A=P[0],B=P[P.length-1],chord=Math.hypot(B[0]-A[0],B[1]-A[1]);
+  if(chord/len>0.94){let ex=B[0],ey=B[1];const a=Math.atan2(ey-A[1],ex-A[0]),q=Math.round(a/(Math.PI/4))*(Math.PI/4);if(Math.abs(a-q)<0.07){ex=A[0]+chord*Math.cos(q);ey=A[1]+chord*Math.sin(q);}
+    return {kind:'line',x1:A[0],y1:A[1],x2:ex,y2:ey};}
+  if(chord>0.22*len)return null;
+  // resample the closed loop evenly
+  const N=72,step=len/N,R=[P[0]];let acc=0;for(let i=1;i<P.length;i++){let [ax,ay]=P[i-1];const [bx,by]=P[i];let d=Math.hypot(bx-ax,by-ay);
+    while(acc+d>=step&&d>0){const t=(step-acc)/d;ax+=(bx-ax)*t;ay+=(by-ay)*t;R.push([ax,ay]);d=Math.hypot(bx-ax,by-ay);acc=0;}acc+=d;}
+  const cx=(x1+x2)/2,cy=(y1+y2)/2,rx=(x2-x1)/2||1,ry=(y2-y1)/2||1;
+  let err=0;for(const [x,y] of R)err+=Math.abs(Math.hypot((x-cx)/rx,(y-cy)/ry)-1);err/=R.length;
+  // corners: simplify the loop, then drop nearly straight vertices
+  const rdp=(pts,eps)=>{if(pts.length<3)return pts;let dm=0,id=0;const [a,b]=[pts[0],pts[pts.length-1]];for(let i=1;i<pts.length-1;i++){const d=distSeg(pts[i][0],pts[i][1],a[0],a[1],b[0],b[1]);if(d>dm){dm=d;id=i;}}
+    return dm>eps?[...rdp(pts.slice(0,id+1),eps).slice(0,-1),...rdp(pts.slice(id),eps)]:[a,b];};
+  // start the loop at the point farthest from the centroid so the seam sits on a corner
+  let far=0,fd=-1;R.forEach(([x,y],i)=>{const d=Math.hypot(x-cx,y-cy);if(d>fd){fd=d;far=i;}});const L=[...R.slice(far),...R.slice(0,far),R[far]];
+  let V=rdp(L,len*0.035).slice(0,-1);
+  const angAt=(p,a,b)=>{const u=[a[0]-p[0],a[1]-p[1]],v=[b[0]-p[0],b[1]-p[1]];return Math.acos(clamp((u[0]*v[0]+u[1]*v[1])/((Math.hypot(...u)*Math.hypot(...v))||1),-1,1));};
+  for(let changed=true;changed&&V.length>3;){changed=false;for(let i=0;i<V.length;i++){const p=V[i],a=V[(i-1+V.length)%V.length],b=V[(i+1)%V.length];
+    if(angAt(p,a,b)>Math.PI*0.86||Math.hypot(p[0]-a[0],p[1]-a[1])<len*0.06){V.splice(i,1);changed=true;break;}}}
+  const k=V.length;
+  if(err<0.085||k>6){if(err>0.16)return null;if(Math.abs(rx-ry)/Math.max(rx,ry)<0.14){const r=(rx+ry)/2;return {kind:'ellipse',x1:cx-r,y1:cy-r,x2:cx+r,y2:cy+r};}return {kind:'ellipse',x1,y1,x2,y2};}
+  if(k<3)return null;
+  if(k===4){const axis=V.every((p,i)=>{const q=V[(i+1)%4];const a=Math.abs(Math.atan2(q[1]-p[1],q[0]-p[0]))%(Math.PI/2);return a<0.2||a>Math.PI/2-0.2;});
+    if(axis){const xs=V.map(p=>p[0]).sort((a,b)=>a-b),ys=V.map(p=>p[1]).sort((a,b)=>a-b);return {kind:'rect',x1:(xs[0]+xs[1])/2,y1:(ys[0]+ys[1])/2,x2:(xs[2]+xs[3])/2,y2:(ys[2]+ys[3])/2};}}
+  const pts=[];for(const [x,y] of V)pts.push(x,y);return polyShape(pts);}
+function polyShape(pts){let x1=Infinity,y1=Infinity,x2=-Infinity,y2=-Infinity;for(let i=0;i<pts.length;i+=2){x1=Math.min(x1,pts[i]);x2=Math.max(x2,pts[i]);y1=Math.min(y1,pts[i+1]);y2=Math.max(y2,pts[i+1]);}return {kind:'poly',pts,x1,y1,x2,y2};}
+function holdCheck(){if(!live||live.straight||live.shape||!live.opt||live.opt.hl||!drag||drag.type!=='draw')return;
+  const sh=recognizeStroke(live.pts);if(!sh)return;live.shape=Object.assign({type:'shape',color:live.opt.color,size:live.opt.size,dash:false},sh);live.flash=performance.now();needOver=true;}
+
+/* ============ templates («Мои заготовки») ============ */
+let templates=[];
+async function loadTemplates(){templates=((await tx('readonly',s=>s.getAll(),'templates'))||[]).sort((a,b)=>b.created-a.created);}
+function openTemplateDlg(){const objs=selObjs();if(!objs.length)return;dlgState={kind:'tpl'};
+  $('#dlgBox').innerHTML=`<h2>Сохранить в заготовки</h2>
+   <div class="tplprev"><img src="${makeThumb(objs,board.bgColor||'#ffffff','none')}" alt=""></div>
+   <label class="fld">Название<input type="text" id="dTpl" maxlength="60" value="${esc('Заготовка '+(templates.length+1))}" autocomplete="off"></label>
+   <span class="hint">Заготовка появится в библиотеке (клавиша G) на вкладке «Мои заготовки». Её можно вставить на любую доску.</span>
+   <div class="dlgbtns"><button type="button" class="btn" data-x>Отмена</button><button type="submit" class="btn pri">Сохранить</button></div>`;
+  showEl($('#dlg'));setTimeout(()=>{const i=$('#dTpl');i.focus();i.select();},0);}
+async function saveTemplate(name){const objs=selObjs();const b=unionBB(objs);if(!b)return;
+  const norm=objs.map(o=>{const n=transformObj(o,(x,y)=>[x-b.x,y-b.y],1,1);delete n.bb;return n;});
+  const t={id:uid(),name:name.trim().slice(0,60)||'Заготовка',objects:norm,w:b.w,h:b.h,thumb:makeThumb(objs,board.bgColor||'#ffffff','none'),created:Date.now()};
+  templates.unshift(t);await tx('readwrite',s=>s.put(t),'templates');toast('Сохранено в «Мои заготовки»');if(!$('#lib').hidden&&libTab==='mine')renderLib();}
+function insertTemplate(id){const t=templates.find(x=>x.id===id);if(!t)return;const [cx,cy]=toWorld(W/2,H/2);const dx=cx-t.w/2,dy=cy-t.h/2;
+  const add=t.objects.map(o=>{const n=transformObj(o,(x,y)=>[x+dx,y+dy],1,1);n.id=uid();return n;});
+  objects=[...objects,...add];commit();setTool('select');setSel(add.map(o=>o.id));}
+async function deleteTemplate(id){templates=templates.filter(t=>t.id!==id);await tx('readwrite',s=>s.delete(id),'templates');renderLib();toast('Заготовка удалена');}
+async function renameTemplate(id,name){const t=templates.find(x=>x.id===id);if(!t||!name.trim())return;t.name=name.trim().slice(0,60);await tx('readwrite',s=>s.put(Object.assign({},t)),'templates');}
+function renderTemplates(){if(!templates.length)return `<div class="tplempty"><svg class="i"><use href="#i-bookmark"/></svg><b>Здесь будут ваши заготовки</b><span>Выделите на доске то, что часто рисуете: чертёж, оформление задачи, таблицу. Затем нажмите <span class="kbd"><svg class="i"><use href="#i-bookmark"/></svg> В заготовки</span> на панели над выделением.</span></div>`;
+  return '<div class="lgrid">'+templates.map(t=>`<div class="litem tpl" data-t="${t.id}"><button class="tplins" data-ti="${t.id}" title="Вставить «${esc(t.name)}»"><img src="${t.thumb}" alt=""></button><span class="tn" data-tr="${t.id}" title="Двойной клик — переименовать">${esc(t.name)}</span><button class="tdel" data-td="${t.id}" title="Удалить заготовку" aria-label="Удалить">×</button></div>`).join('')+'</div>';}
+
+/* ============ code blocks (Python) ============ */
+const MONO='"JetBrains Mono", Consolas, "Courier New", monospace';
+const PY_KW=new Set('and as assert async await break class continue def del elif else except False finally for from global if import in is lambda None nonlocal not or pass raise return True try while with yield match case'.split(' '));
+const PY_BI=new Set('print input range len int float str list dict set tuple sum min max abs sorted reversed map filter enumerate zip open round bin oct hex ord chr any all divmod pow isinstance type format'.split(' '));
+const codeCache=new WeakMap();let runningId=null;
+function codeLayout(o){let L=codeCache.get(o);if(L)return L;const s=o.size||15,lh=s*1.5,pad=s*.9,head=s*2;
+  const lines=String(o.code||'').replace(/\t/g,'    ').split('\n');const outRaw=(o.out||'')+(o.err?(o.out&&!o.out.endsWith('\n')?'\n':'')+o.err:'');
+  const maxc=Math.max(8,Math.floor((o.w-2*pad)/(s*0.602)));const wrap=t=>{const r=[];do{r.push(t.slice(0,maxc));t=t.slice(maxc);}while(t.length);return r;};
+  const outLines=[];let errFrom=Infinity;if(outRaw){const outPart=(o.out||'').replace(/\n$/,'');String(outRaw).replace(/\n$/,'').split('\n').forEach((t,i,arr)=>{if(o.err&&errFrom===Infinity&&i>=(outPart?outPart.split('\n').length:0))errFrom=outLines.length;outLines.push(...wrap(t));});}
+  outLines.length=Math.min(outLines.length,80);
+  const codeH=head+pad+lines.length*lh+pad;const outH=outLines.length?pad*.6+lh+outLines.length*lh+pad:0;
+  L={s,lh,pad,head,lines,outLines,errFrom,codeH,h:codeH+outH};codeCache.set(o,L);return L;}
+function codeColors(){return T.dark?{bg:'#1b1f27',bg2:'#151820',edge:'rgba(255,255,255,.12)',fg:'#e6e9ef',kw:'#c792ea',str:'#a5d6a7',num:'#ffb07a',com:'#7f8799',bi:'#82aaff',muted:'#8a93a6',err:'#ff8a8f',dot:'#ffd43b'}
+  :{bg:'#fbfcfe',bg2:'#f2f4f8',edge:'rgba(30,45,90,.18)',fg:'#1b1f29',kw:'#8b3fd9',str:'#2a8a3e',num:'#c2410c',com:'#8a93a3',bi:'#2b59e0',muted:'#6a7282',err:'#d93b41',dot:'#e8b400'};}
+function pyTokens(line){const out=[];const re=/(#.*$)|("(?:\\.|[^"\\])*"?|'(?:\\.|[^'\\])*'?)|\b(\d+(?:\.\d+)?)\b|\b([A-Za-z_][A-Za-z0-9_]*)\b/g;let m,last=0;
+  while((m=re.exec(line))){if(m.index>last)out.push(['',line.slice(last,m.index)]);const t=m[1]?'com':m[2]?'str':m[3]?'num':PY_KW.has(m[4])?'kw':PY_BI.has(m[4])?'bi':'';out.push([t,m[0]]);last=re.lastIndex;}
+  if(last<line.length)out.push(['',line.slice(last)]);return out;}
+function drawCode(ctx,o){const L=codeLayout(o),C=codeColors(),{s,lh,pad,head}=L,x=o.x,y=o.y,w=o.w,r=s*.6;
+  ctx.save();ctx.fillStyle=C.bg;ctx.strokeStyle=C.edge;ctx.lineWidth=1;ctx.beginPath();ctx.roundRect?ctx.roundRect(x,y,w,L.h,r):ctx.rect(x,y,w,L.h);ctx.fill();ctx.stroke();
+  ctx.save();ctx.clip();
+  // header
+  ctx.fillStyle=C.bg2;ctx.fillRect(x,y,w,head);ctx.fillStyle=C.edge;ctx.fillRect(x,y+head,w,1);
+  ctx.fillStyle=C.dot;ctx.beginPath();ctx.arc(x+pad+s*.3,y+head/2,s*.3,0,7);ctx.fill();
+  ctx.font=`600 ${s*.8}px ${MONO}`;ctx.fillStyle=C.muted;ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText('Python',x+pad+s*.9,y+head/2);
+  if(runningId===o.id){ctx.textAlign='right';ctx.fillText('выполняется…',x+w-pad,y+head/2);ctx.textAlign='left';}
+  // code
+  ctx.font=`${s}px ${MONO}`;ctx.textBaseline='alphabetic';let yy=y+head+pad+s*1.05;
+  for(const ln of L.lines){let xx=x+pad;for(const [t,txt] of pyTokens(ln)){ctx.fillStyle=t?C[t]:C.fg;ctx.font=`${t==='com'?'italic ':''}${t==='kw'?'600 ':''}${s}px ${MONO}`;ctx.fillText(txt,xx,yy);xx+=ctx.measureText(txt).width;if(xx>x+w)break;}yy+=lh;}
+  // output
+  if(L.outLines.length){const oy=y+L.codeH;ctx.fillStyle=C.bg2;ctx.fillRect(x,oy,w,L.h-L.codeH);ctx.fillStyle=C.edge;ctx.fillRect(x,oy,w,1);
+    ctx.font=`600 ${s*.72}px "Golos Text", system-ui, sans-serif`;ctx.fillStyle=C.muted;ctx.fillText(o.err?'ВЫВОД · ОШИБКА':'ВЫВОД',x+pad,oy+pad*.6+lh*.75);
+    ctx.font=`${s}px ${MONO}`;let y2=oy+pad*.6+lh+lh*.75;const errFrom=L.errFrom;
+    L.outLines.forEach((t,i)=>{ctx.fillStyle=i>=errFrom?C.err:C.fg;ctx.fillText(t,x+pad,y2);y2+=lh;});}
+  ctx.restore();ctx.restore();}
+function newCodeBlock(){const [cx,cy]=toWorld(W/2,H/2);const o={id:uid(),type:'code',x:cx-220,y:cy-140,w:440,size:15,code:'# Сумма цифр числа\nn = int(input())\ns = 0\nwhile n > 0:\n    s += n % 10\n    n //= 10\nprint(s)',inp:'2026',out:'',err:''};
+  objects=[...objects,o];commit();setTool('select');setSel([o.id]);openCodePanel(o.id,true);}
+
+/* runner: Pyodide in a worker, so a hung program can be stopped */
+const PYV='0.26.4';let pyWorker=null,pyTimer=null,pyRun=null;
+function pyBase(){return window.DOSKA_APP&&!window.DOSKA_DEV?new URL('pyodide/',location.href).href:`https://cdn.jsdelivr.net/npm/pyodide@${PYV}/`;}
+const PY_WORKER=`let py=null;
+self.onmessage=async e=>{const {base,code,input}=e.data;
+  try{if(!py){importScripts(base+'pyodide.js');py=await loadPyodide({indexURL:base});}}
+  catch(err){self.postMessage({t:'fail',err:String(err&&err.message||err)});return;}
+  self.postMessage({t:'start'});let out='';const lines=String(input||'').split('\\n');let li=0;
+  py.setStdout({batched:s=>{if(out.length<100000)out+=s+'\\n';}});py.setStderr({batched:s=>{if(out.length<100000)out+=s+'\\n';}});
+  py.setStdin({stdin:()=>li<lines.length&&!(li===lines.length-1&&lines[li]==='')?lines[li++]:undefined});
+  try{await py.runPythonAsync(code);self.postMessage({t:'done',out});}
+  catch(err){self.postMessage({t:'done',out,err:String(err&&err.message||err)});}};`;
+function tidyPyError(e){const lines=String(e).trim().split('\n');const i=lines.findIndex(l=>l.includes('File "<exec>"'));const keep=i>=0?lines.slice(i):lines.slice(-3);
+  return keep.map(l=>l.replace(/File "<exec>", line (\d+)(, in <module>)?/,'Строка $1:').trim()).filter(Boolean).join('\n')
+    .replace(/EOFError: EOF when reading a line/,'EOFError: программа ждёт input(), а данных не хватило. Впишите их в поле «Данные для input()».');}
+function stopPython(msg){if(pyWorker){pyWorker.terminate();pyWorker=null;}clearTimeout(pyTimer);if(pyRun){finishRun(pyRun.id,{out:pyRun.partial||'',err:msg||'Остановлено.'});}}
+function finishRun(id,res){const o=byId(id);pyRun=null;runningId=null;clearTimeout(pyTimer);
+  if(o){replaceObjs(new Map([[id,Object.assign({},o,{out:res.out||'',err:res.err?tidyPyError(res.err):''})]]));commit();}
+  dirtyAll();updateCodePanelRun();}
+function runPython(id){const o=byId(id);if(!o)return;if(pyRun)stopPython('Остановлено.');
+  runningId=id;pyRun={id};dirtyAll();updateCodePanelRun('Загружаю Python…');
+  if(!pyWorker){try{pyWorker=new Worker(URL.createObjectURL(new Blob([PY_WORKER],{type:'text/javascript'})));}catch(e){finishRun(id,{err:'Не удалось запустить Python в этом окне.'});return;}}
+  const w=pyWorker;
+  w.onmessage=e=>{const m=e.data;if(!pyRun||pyRun.id!==id)return;
+    if(m.t==='start'){updateCodePanelRun('Выполняется…');clearTimeout(pyTimer);pyTimer=setTimeout(()=>stopPython('Программа работает дольше 10 секунд — я её остановил. Возможно, это бесконечный цикл.'),10000);}
+    else if(m.t==='done')finishRun(id,{out:m.out,err:m.err});
+    else if(m.t==='fail'){pyWorker&&pyWorker.terminate();pyWorker=null;finishRun(id,{err:window.DOSKA_APP?'Не удалось загрузить Python: '+m.err:'Запуск кода работает в приложении Лемма. В браузере он недоступен.'});}};
+  w.onerror=e=>{if(pyRun&&pyRun.id===id){pyWorker&&pyWorker.terminate();pyWorker=null;finishRun(id,{err:window.DOSKA_APP?'Не удалось загрузить Python.':'Запуск кода работает в приложении Лемма. В браузере он недоступен.'});}};
+  w.postMessage({base:pyBase(),code:o.code||'',input:o.inp||''});}
+
+/* code panel */
+let cpId=null,cCommitT=null;
+function cpObj(){return cpId?byId(cpId):null;}
+function syncCodePanel(){const objs=selObjs();const one=objs.length===1&&objs[0].type==='code'?objs[0]:null;
+  if(one){if(cpId!==one.id||$('#cpanel').hidden)openCodePanel(one.id,false);}else hideCodePanel();}
+function hideCodePanel(){if(cCommitT){clearTimeout(cCommitT);cCommitT=null;commit();}cpId=null;hideAnim($('#cpanel'),160);}
+function openCodePanel(id,focus){const o=byId(id);if(!o)return;if(cCommitT){clearTimeout(cCommitT);cCommitT=null;commit();}cpId=id;showEl($('#cpanel'));
+  $('#cCode').value=o.code||'';$('#cIn').value=o.inp||'';updateCodePanelRun();if(focus)setTimeout(()=>$('#cCode').focus(),0);}
+function updateCodePanelRun(msg){const o=cpObj();const busy=!!(pyRun&&o&&pyRun.id===o.id);$('#cRun').hidden=busy;$('#cStop').hidden=!busy;
+  $('#cStatus').textContent=busy?(msg||'Выполняется…'):'';
+  const out=$('#cOut');if(!o){out.textContent='';return;}out.innerHTML=(o.out?esc(o.out):'')+(o.err?`<span class="cerr">${esc(o.err)}</span>`:'');out.hidden=!(o.out||o.err);}
+function updateCodeObj(patch){const o=cpObj();if(!o)return;replaceObjs(new Map([[o.id,Object.assign({},o,patch)]]));dirtyAll();clearTimeout(cCommitT);cCommitT=setTimeout(()=>{cCommitT=null;commit();},700);scheduleSave();}
+
+/* ============ PDF export ============ */
+function drawPatternArea(ctx,r,k,pattern){if(pattern==='none')return;
+  if(pattern==='grid'){let s=20;const maj=100;ctx.lineWidth=1;for(const major of [false,true]){ctx.strokeStyle=major?T.gridMajor:T.grid;ctx.beginPath();
+    for(let x=Math.ceil(r.x/s)*s;x<=r.x+r.w;x+=s){if((Math.abs(Math.round(x/maj)*maj-x)<.001)!==major)continue;const px=Math.round((x-r.x)*k)+.5;ctx.moveTo(px,0);ctx.lineTo(px,r.h*k);}
+    for(let y=Math.ceil(r.y/s)*s;y<=r.y+r.h;y+=s){if((Math.abs(Math.round(y/maj)*maj-y)<.001)!==major)continue;const py=Math.round((y-r.y)*k)+.5;ctx.moveTo(0,py);ctx.lineTo(r.w*k,py);}ctx.stroke();}}
+  else{const s=25;ctx.fillStyle=T.dot;const d=Math.max(1.2,k*1.1);for(let x=Math.ceil(r.x/s)*s;x<=r.x+r.w;x+=s)for(let y=Math.ceil(r.y/s)*s;y<=r.y+r.h;y+=s)ctx.fillRect((x-r.x)*k-d/2,(y-r.y)*k-d/2,d,d);}}
+async function renderArea(list,r,k,pattern,clipY){const c=document.createElement('canvas');c.width=Math.max(1,Math.round(r.w*k));c.height=Math.max(1,Math.round(r.h*k));const x=c.getContext('2d');
+  x.fillStyle=T.board;x.fillRect(0,0,c.width,c.height);drawPatternArea(x,r,k,pattern);
+  x.save();if(clipY){x.beginPath();x.rect(0,(clipY[0]-r.y)*k,c.width,(clipY[1]-clipY[0])*k);x.clip();}
+  x.setTransform(k,0,0,k,-r.x*k,-r.y*k);if(clipY){x.beginPath();x.rect(r.x,clipY[0],r.w,clipY[1]-clipY[0]);x.clip();}
+  const band={x:r.x,y:clipY?clipY[0]:r.y,w:r.w,h:clipY?clipY[1]-clipY[0]:r.h};for(const o of list){if(inter(bounds(o),band)){try{drawObj(x,o)}catch(e){}}}x.restore();return c;}
+function canvasJpeg(c){return new Promise(res=>c.toBlob(b=>b.arrayBuffer().then(a=>res(new Uint8Array(a))),'image/jpeg',.9));}
+function buildPDF(pages){const enc=new TextEncoder();const parts=[];let len=0;const offs=[];
+  const push=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length;};
+  const obj=(n,body)=>{offs[n]=len;push(`${n} 0 obj\n`);if(Array.isArray(body))body.forEach(push);else push(body);push('\nendobj\n');};
+  push('%PDF-1.4\n%\u00ff\n');const n=pages.length,kids=pages.map((p,i)=>`${3+3*i} 0 R`).join(' ');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,`<< /Type /Pages /Kids [${kids}] /Count ${n} >>`);
+  pages.forEach((p,i)=>{const pg=3+3*i,ct=4+3*i,im=5+3*i;const f=v=>(Math.round(v*100)/100).toString();
+    obj(pg,`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${f(p.W)} ${f(p.H)}] /Resources << /XObject << /Im${i} ${im} 0 R >> >> /Contents ${ct} 0 R >>`);
+    const cs=`q ${f(p.W)} 0 0 ${f(p.H)} 0 0 cm /Im${i} Do Q`;obj(ct,`<< /Length ${cs.length} >>\nstream\n${cs}\nendstream`);
+    obj(im,[`<< /Type /XObject /Subtype /Image /Width ${p.w} /Height ${p.h} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${p.jpg.length} >>\nstream\n`,p.jpg,'\nendstream']);});
+  const xref=len;let x=`xref\n0 ${3*n+3}\n0000000000 65535 f \n`;for(let i=1;i<3*n+3;i++)x+=String(offs[i]).padStart(10,'0')+' 00000 n \n';
+  push(x+`trailer\n<< /Size ${3*n+3} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`);return new Blob(parts,{type:'application/pdf'});}
+async function exportPDF(opts){const list=opts.sel?selObjs():objects;const b=unionBB(list);if(!b){toast('На доске пока пусто');return;}
+  const pattern=opts.pattern?board.bg:'none';const PX=1800;const pages=[];
+  if(opts.mode==='one'){const m=Math.max(b.w,b.h)*0.04;const r={x:b.x-m,y:b.y-m,w:b.w+2*m,h:b.h+2*m};const k=Math.min(PX*1.6/Math.max(r.w,r.h),3);
+    const c=await renderArea(list,r,k,pattern);const pw=r.w>=r.h?842:Math.max(300,842*r.w/r.h);const ph=pw*r.h/r.w;
+    pages.push({W:pw,H:ph,w:c.width,h:c.height,jpg:await canvasJpeg(c)});}
+  else{const land=b.w>b.h*1.15;const PW=land?842:595,PH=land?595:842;const m=b.w*0.045;const pageW=b.w+2*m,pageH=pageW*PH/PW,inner=pageH-2*m;
+    const iv=list.map(o=>{const bb=bounds(o);return [bb.y,bb.y+bb.h];}).filter(([a,z])=>z-a<inner*0.9);
+    const free=y=>!iv.some(([a,z])=>y>a+1&&y<z-1);let y0=b.y;const k=PX/pageW;
+    for(let guard=0;guard<60&&y0<b.y+b.h-0.5;guard++){let y1=y0+inner;if(y1<b.y+b.h){const lim=y0+inner*0.65;let cut=null;for(let y=y1;y>=lim;y-=3){if(free(y)){cut=y;break;}}if(cut)y1=cut;}else y1=b.y+b.h;
+      const r={x:b.x-m,y:y0-m,w:pageW,h:pageH};const c=await renderArea(list,r,k,pattern,[y0-(guard?0:m),y1]);pages.push({W:PW,H:PH,w:c.width,h:c.height,jpg:await canvasJpeg(c)});y0=y1;}}
+  const blob=buildPDF(pages);saveBlob(blob,safeName(board.name)+'.pdf');return pages.length;}
+function openPdfDlg(){dlgState={kind:'pdf'};const hasSel=selection.size>0;
+  $('#dlgBox').innerHTML=`<h2>Экспорт в PDF</h2>
+   ${hasSel?`<div class="fld">Что сохранить<div class="seg2"><label><input type="radio" name="pWhat" value="all" checked><span>Всю доску</span></label><label><input type="radio" name="pWhat" value="sel"><span>Только выделенное</span></label></div></div>`:''}
+   <div class="fld">Как разложить<div class="seg2"><label><input type="radio" name="pMode" value="a4" checked><span>Листы A4<small>удобно печатать</small></span></label><label><input type="radio" name="pMode" value="one"><span>Одна страница<small>вся доска целиком</small></span></label></div></div>
+   <label class="chk"><input type="checkbox" id="pGrid"${board.bg==='none'?'':' checked'}><span>Сохранить фон с ${board.bg==='dots'?'точками':'клеткой'}</span></label>
+   <span class="hint">На листах A4 Лемма старается разрезать доску между задачами, а не посередине чертежа.</span>
+   <div class="dlgbtns"><button type="button" class="btn" data-x>Отмена</button><button type="submit" class="btn pri">Сохранить PDF</button></div>`;
+  showEl($('#dlg'));}
+
+$('#cclose').onclick=()=>hideCodePanel();
+$('#cpanel').addEventListener('pointerdown',e=>e.stopPropagation());
+$('#cCode').addEventListener('input',e=>updateCodeObj({code:e.target.value}));
+$('#cIn').addEventListener('input',e=>updateCodeObj({inp:e.target.value}));
+for(const id of ['cCode','cIn'])$('#'+id).addEventListener('keydown',e=>{e.stopPropagation();const t=e.target;
+  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){e.preventDefault();if(cCommitT){clearTimeout(cCommitT);cCommitT=null;commit();}if(cpId)runPython(cpId);return;}
+  if(e.key==='Escape'){t.blur();return;}
+  if(id==='cCode'&&e.key==='Tab'){e.preventDefault();const a=t.selectionStart,z=t.selectionEnd,v=t.value;
+    if(a!==z&&v.slice(a,z).includes('\n')){const ls0=v.lastIndexOf('\n',a-1)+1;const block=v.slice(ls0,z);const nb=e.shiftKey?block.replace(/^ {1,4}/gm,''):block.replace(/^/gm,'    ');t.value=v.slice(0,ls0)+nb+v.slice(z);t.selectionStart=ls0;t.selectionEnd=ls0+nb.length;}
+    else if(e.shiftKey){const ls0=v.lastIndexOf('\n',a-1)+1;const m=v.slice(ls0).match(/^ {1,4}/);if(m){t.value=v.slice(0,ls0)+v.slice(ls0+m[0].length);t.selectionStart=t.selectionEnd=Math.max(ls0,a-m[0].length);}}
+    else{t.value=v.slice(0,a)+'    '+v.slice(z);t.selectionStart=t.selectionEnd=a+4;}updateCodeObj({code:t.value});}
+  if(id==='cCode'&&e.key==='Enter'&&!e.ctrlKey&&!e.shiftKey){const a=t.selectionStart,v=t.value;const ls0=v.lastIndexOf('\n',a-1)+1;const cur=v.slice(ls0,a);let ind=cur.match(/^ */)[0];if(/:\s*$/.test(cur))ind+='    ';
+    e.preventDefault();t.value=v.slice(0,a)+'\n'+ind+v.slice(t.selectionEnd);t.selectionStart=t.selectionEnd=a+1+ind.length;updateCodeObj({code:t.value});}});
+$('#cRun').onclick=()=>{if(cCommitT){clearTimeout(cCommitT);cCommitT=null;commit();}if(cpId)runPython(cpId);};
+$('#cStop').onclick=()=>stopPython('Остановлено.');
 
 /* ============ example board ============ */
 function seedExample(){const o=[];const add=x=>{x.id=uid();o.push(x);return x;};
@@ -1432,7 +1713,7 @@ function seedExample(){const o=[];const add=x=>{x.id=uid();o.push(x);return x;};
 
 /* ============ boot ============ */
 async function boot(){resize();readTheme();setTool(tool);updatePenModeUI();updateHistUI();requestAnimationFrame(frame);
-  db=await idb();await loadMeta();const cur=ls.get('current',null);
+  db=await idb();await loadMeta();try{await loadTemplates();}catch(e){}const cur=ls.get('current',null);
   const pick=boardsMeta.find(b=>b.id===cur)||[...boardsMeta].sort((a,b)=>b.updated-a.updated)[0];
   let rec=pick?await tx('readonly',s=>s.get(pick.id)):null;
   if(!rec){rec={id:uid(),name:'Пример урока',date:todayISO(),tags:['пример'],bg:'grid',bgColor:'#ffffff',objects:seedExample(),view:null,updated:Date.now()};applyBoard(rec);fitAll();await saveNow({thumb:true});}
