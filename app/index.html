@@ -660,7 +660,8 @@ let tool=ls.get('tool','pen');
 const S=Object.assign({pen:{color:'ink',size:3},marker:{color:'yellow',size:22},shape:{kind:'line',dash:false,color:'ink',size:3},text:{color:'ink',size:28,font:'sans'}},ls.get('settings',{}));
 let penMode=ls.get('penMode',false);
 let editingId=null;
-const SIZES={pen:[1.6,3,5.5],marker:[12,22,34],shape:[1.6,3,5.5],text:[20,28,42]};
+S.eraser=Object.assign({mode:'part',size:12},S.eraser||{});
+const SIZES={eraser:[6,12,26],pen:[1.6,3,5.5],marker:[12,22,34],shape:[1.6,3,5.5],text:[20,28,42]};
 
 function setObjects(arr,record=true){objects=arr; if(record) commit(); else dirtyAll();}
 function commit(){hist.stack.length=hist.idx+1;hist.stack.push(objects.slice());if(hist.stack.length>150)hist.stack.shift();hist.idx=hist.stack.length-1;dirtyAll();scheduleSave();updateHistUI();}
@@ -1052,7 +1053,7 @@ function renderOver(){const ctx=octx;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clear
     needOver=true;}
   // hover cursor
   if(hover){const [x,y]=toScreen(hover.x,hover.y);ctx.lineWidth=1;
-    if(hover.kind==='eraser'){ctx.strokeStyle=T.muted;ctx.beginPath();ctx.arc(x,y,ERASER_R,0,7);ctx.stroke();}
+    if(hover.kind==='eraser'){ctx.strokeStyle=T.muted;ctx.beginPath();ctx.arc(x,y,eraserR(),0,7);ctx.stroke();if(S.eraser.mode==='whole'){ctx.beginPath();ctx.moveTo(x-3,y-3);ctx.lineTo(x+3,y+3);ctx.moveTo(x+3,y-3);ctx.lineTo(x-3,y+3);ctx.stroke();}}
     else if(hover.kind==='laser'){ctx.fillStyle='rgba(255,48,64,.9)';ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.fill();}
     else{const r=Math.max(1.5,hover.size*z/2);ctx.fillStyle=hover.color;ctx.globalAlpha=hover.kind==='marker'?.5:1;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.globalAlpha=1;if(r<4){ctx.strokeStyle=T.muted;ctx.globalAlpha=.6;ctx.beginPath();ctx.arc(x,y,r+3,0,7);ctx.stroke();ctx.globalAlpha=1;}}}
 }
@@ -1145,7 +1146,7 @@ function cloneObj(o,dx,dy){const n=transformObj(o,(x,y)=>[x+dx,y+dy],1,1);n.id=u
 function duplicateSel(){if(!selection.size)return;const c=selObjs().map(o=>cloneObj(o,24,24));objects=[...objects,...c];setSel(c.map(o=>o.id));commit();}
 
 /* ============ input ============ */
-const ERASER_R=11;
+function eraserR(){return S.eraser.size||12;}
 let spaceDown=false;
 const touches=new Map();
 let pinch=null;
@@ -1184,7 +1185,7 @@ function onDown(e){
   const now=performance.now();const dbl=now-lastDown.t<350&&Math.hypot(sx-lastDown.x,sy-lastDown.y)<8;lastDown={t:now,x:sx,y:sy};
   if(t==='pen'||t==='marker'){const opt=t==='pen'?{color:S.pen.color,size:S.pen.size,pr:e.pointerType==='pen'}:{color:S.marker.color,size:S.marker.size,pr:false,hl:true};
     live={pts:[wx,wy,e.pointerType==='pen'?e.pressure||.5:.5],opt,last:[wx,wy],anchor:[wx,wy],pen:e.pointerType==='pen'};drag={type:'draw',id:e.pointerId};needOver=true;return;}
-  if(t==='eraser'){drag={type:'erase',id:e.pointerId,gone:new Set(),px:wx,py:wy};eraseAt(wx,wy,wx,wy);hover={x:wx,y:wy,kind:'eraser'};return;}
+  if(t==='eraser'){drag={type:'erase',id:e.pointerId,gone:new Set(),px:wx,py:wy,part:S.eraser.mode!=='whole',changed:false};eraseAt(wx,wy,wx,wy);hover={x:wx,y:wy,kind:'eraser'};return;}
   if(t==='shape'){drag={type:'shape',id:e.pointerId,x:wx,y:wy};shapePrev={type:'shape',kind:S.shape.kind,dash:S.shape.dash,color:S.shape.color,size:S.shape.size,x1:wx,y1:wy,x2:wx,y2:wy};return;}
   if(t==='text'){const tol=6/view.z;const hitT=[...objects].reverse().find(o=>o.type==='text'&&hitObj(o,wx,wy,tol));if(hitT)editText(hitT);else newText(wx,wy);return;}
   if(t==='laser'){laser.push({x:wx,y:wy,t:performance.now()});drag={type:'laser',id:e.pointerId};needOver=true;return;}
@@ -1263,7 +1264,29 @@ function onMove(e){
     case 'marquee':marquee.x2=wx;marquee.y2=wy;{const r={x:Math.min(marquee.x1,wx),y:Math.min(marquee.y1,wy),w:Math.abs(wx-marquee.x1),h:Math.abs(wy-marquee.y1)};selection=new Set(objects.filter(o=>inter(bounds(o),r)).map(o=>o.id));}needOver=true;break;
   }
 }
-function eraseAt(x0,y0,x1,y1){const r=ERASER_R/view.z;const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/(r*.6)));
+/* partial eraser: cut away only the part of a line under the eraser */
+function strokeRunsOf(o){if(o.type==='stroke')return {pts:o.pts,opt:{color:o.color,size:o.size,pr:o.pr,hl:o.hl}};
+  if(o.type!=='shape')return null;const P=[];const add=(x,y)=>P.push(x,y,.5);
+  if(o.kind==='line'||o.kind==='arrow'){add(o.x1,o.y1);add(o.x2,o.y2);}
+  else if(o.kind==='poly'){for(let i=0;i<o.pts.length;i+=2)add(o.pts[i],o.pts[i+1]);add(o.pts[0],o.pts[1]);}
+  else{const cx=(o.x1+o.x2)/2,cy=(o.y1+o.y2)/2,rx=Math.abs(o.x2-o.x1)/2,ry=Math.abs(o.y2-o.y1)/2,a=o.ang||0,ca=Math.cos(a),sa=Math.sin(a);
+    const rot=(x,y)=>[cx+(x-cx)*ca-(y-cy)*sa,cy+(x-cx)*sa+(y-cy)*ca];
+    if(o.kind==='rect'){const c=[[cx-rx,cy-ry],[cx+rx,cy-ry],[cx+rx,cy+ry],[cx-rx,cy+ry],[cx-rx,cy-ry]];for(const q of c)add(...rot(q[0],q[1]));}
+    else{const n=Math.max(24,Math.round((rx+ry)/3));for(let i=0;i<=n;i++){const t=i/n*Math.PI*2;add(...rot(cx+rx*Math.cos(t),cy+ry*Math.sin(t)));}}}
+  return {pts:P,opt:{color:o.color,size:o.size,pr:false,hl:false},dash:o.dash};}
+function eraseSplit(o,x0,y0,x1,y1,r){const src=strokeRunsOf(o);if(!src)return null;const p=src.pts,rr=r+(src.opt.hl?src.opt.size*.4:src.opt.size*.25);
+  // densify so a fast eraser cannot jump over a long segment
+  const step=Math.max(.5,rr*.5);const q=[];for(let i=0;i<p.length;i+=3){if(i){const dx=p[i]-p[i-3],dy=p[i+1]-p[i-2],L=Math.hypot(dx,dy);const k=Math.floor(L/step);for(let j=1;j<k;j++)q.push(p[i-3]+dx*j/k,p[i-2]+dy*j/k,p[i-1]+(p[i+2]-p[i-1])*j/k);}q.push(p[i],p[i+1],p[i+2]);}
+  const runs=[];let cur=[],hit=false;
+  for(let i=0;i<q.length;i+=3){if(distSeg(q[i],q[i+1],x0,y0,x1,y1)<=rr){hit=true;if(cur.length)runs.push(cur);cur=[];}else cur.push(q[i],q[i+1],q[i+2]);}
+  if(cur.length)runs.push(cur);if(!hit)return null;
+  return runs.filter(rn=>rn.length>=6||(rn.length===3&&o.type==='stroke'&&o.pts.length===3)).map(rn=>makeStroke(rn,src.opt));}
+function eraseAt(x0,y0,x1,y1){const r=eraserR()/view.z;
+  if(drag.part){const box={x:Math.min(x0,x1)-r-20,y:Math.min(y0,y1)-r-20,w:Math.abs(x1-x0)+2*r+40,h:Math.abs(y1-y0)+2*r+40};let changed=false;const rebuilt=[];
+    for(const o of objects){if((o.type!=='stroke'&&o.type!=='shape')||!inter(bounds(o),box)){rebuilt.push(o);continue;}const res=eraseSplit(o,x0,y0,x1,y1,r);if(res){rebuilt.push(...res);changed=true;}else rebuilt.push(o);}
+    if(changed){objects=rebuilt;drag.changed=true;needBase=true;}
+    return;}
+  const n=Math.max(1,Math.ceil(Math.hypot(x1-x0,y1-y0)/(r*.6)));
   for(const o of objects){if(drag.gone.has(o.id))continue;if(o.type!=='stroke'&&o.type!=='shape')continue;
     for(let i=0;i<=n;i++){const x=x0+(x1-x0)*i/n,y=y0+(y1-y0)*i/n;if(hitObj(o,x,y,r)){drag.gone.add(o.id);needBase=true;break;}}}}
 function onUp(e){
@@ -1275,7 +1298,7 @@ function onUp(e){
     case 'draw':{if(live)clearTimeout(live.holdT);if(live&&live.shape){const sh=Object.assign({},live.shape,{id:uid()});objects=[...objects,sh];commit();live=null;const back=tool;setTool('select');returnTool=back;setSel([sh.id]);needOver=true;break;}
       if(live&&live.pts.length){if(live.pen&&!live.straight){const [x,y]=toWorld(...evPos(e));const L=live.last;if(Math.hypot(x-L[0],y-L[1])*view.z>.6)live.pts.push(x,y,live.pts[live.pts.length-1]);}
       objects=[...objects,makeStroke(live.pts,Object.assign({},live.opt,{st:live.straight}))];commit();}live=null;needOver=true;break;}
-    case 'erase':if(d.gone.size){objects=objects.filter(o=>!d.gone.has(o.id));commit();}else dirtyAll();if(tool!=='eraser')hover=null;break;
+    case 'erase':if(d.part){if(d.changed){pruneSel();commit();}else dirtyAll();if(tool!=='eraser')hover=null;break;}if(d.gone.size){objects=objects.filter(o=>!d.gone.has(o.id));commit();}else dirtyAll();if(tool!=='eraser')hover=null;break;
     case 'shape':{const s=shapePrev;shapePrev=null;if(Math.hypot(s.x2-s.x1,s.y2-s.y1)*view.z>4){s.id=uid();objects=[...objects,s];commit();}needOver=true;break;}
     case 'laser':break;
     case 'move':if(Math.abs(d.dx)>.01||Math.abs(d.dy)>.01){const m=new Map();for(const o of selObjs())m.set(o.id,transformObj(o,(x,y)=>[x+d.dx,y+d.dy],1,1));replaceObjs(m);commit();}dirtyAll();buildSelbar();break;
@@ -1350,6 +1373,7 @@ function buildProps(){const p=$('#props');const t=tool;let h='';
   const sws=(keys,cur,key)=>keys.map(c=>`<button class="sw${cur===c?' on':''}" data-set="${key}.color" data-v="${c}" title="Цвет"><i style="background:${col(c)}"></i></button>`).join('');
   const szs=(key,cur)=>SIZES[key].map((s,i)=>`<button class="sz${Math.abs(cur-s)<.01?' on':''}" data-set="${key}.size" data-v="${s}" title="Толщина"><b style="width:${key==='text'?6+i*4:key==='marker'?7+i*4:3+i*3.5}px;height:${key==='text'?6+i*4:key==='marker'?7+i*4:3+i*3.5}px"></b></button>`).join('');
   if(t==='pen')h=sws(Object.keys(PAL),S.pen.color,'pen')+'<span class="sep"></span>'+szs('pen',S.pen.size);
+  else if(t==='eraser')h=`<button class="tbtn${S.eraser.mode!=='whole'?' on':''}" data-set="eraser.mode" data-v="part" title="Стирать кусочками">Кусочками</button><button class="tbtn${S.eraser.mode==='whole'?' on':''}" data-set="eraser.mode" data-v="whole" title="Стирать линию целиком">Целиком</button><span class="sep"></span>`+SIZES.eraser.map((v,i)=>`<button class="sz${S.eraser.size===v?' on':''}" data-set="eraser.size" data-v="${v}" title="Размер ластика"><b style="width:${6+i*5}px;height:${6+i*5}px;background:none;box-shadow:inset 0 0 0 1.6px currentColor"></b></button>`).join('');
   else if(t==='marker')h=sws(Object.keys(HL),S.marker.color,'marker')+'<span class="sep"></span>'+szs('marker',S.marker.size);
   else if(t==='shape')h=['line','arrow','rect','ellipse'].map(k=>`<button class="tbtn${S.shape.kind===k?' on':''}" data-set="shape.kind" data-v="${k}" title="${{line:'Линия',arrow:'Стрелка',rect:'Прямоугольник',ellipse:'Эллипс'}[k]}"><svg class="i"><use href="#i-${k}"/></svg></button>`).join('')+`<button class="tbtn${S.shape.dash?' on':''}" data-set="shape.dash" data-v="${!S.shape.dash}" title="Пунктир (для невидимых рёбер)"><svg class="i"><use href="#i-dash"/></svg></button><span class="sep"></span>`+sws(Object.keys(PAL),S.shape.color,'shape')+'<span class="sep"></span>'+szs('shape',S.shape.size);
   else if(t==='text')h=sws(Object.keys(PAL),S.text.color,'text')+'<span class="sep"></span>'+szs('text',S.text.size)+'<span class="sep"></span>'+`<button class="tbtn${S.text.font==='sans'?' on':''}" data-set="text.font" data-v="sans" title="Обычный шрифт">Аа</button><button class="tbtn${S.text.font==='serif'?' on':''}" data-set="text.font" data-v="serif" title="Математический курсив" style="font:italic 17px var(--math)">x</button>`;
