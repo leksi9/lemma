@@ -6,6 +6,8 @@
 поэтому перо планшета с нажимом работает так же, как в браузере.
 """
 import base64
+import hashlib
+import shutil
 import inspect
 import os
 import sys
@@ -27,6 +29,26 @@ def find_index():
         if os.path.isfile(path):
             return path
     return candidates[0]
+
+
+def fresh_copy(index):
+    """Кладём страницу в папку с именем по её содержимому. Новая версия = новый адрес,
+    поэтому движок окна никогда не покажет старую закэшированную страницу."""
+    try:
+        with open(index, "rb") as f:
+            digest = hashlib.md5(f.read()).hexdigest()[:12]
+        web = os.path.join(data_dir(), "web")
+        target_dir = os.path.join(web, digest)
+        target = os.path.join(target_dir, "index.html")
+        if not os.path.isfile(target):
+            os.makedirs(target_dir, exist_ok=True)
+            shutil.copyfile(index, target)
+        for name in os.listdir(web):
+            if name != digest:
+                shutil.rmtree(os.path.join(web, name), ignore_errors=True)
+        return target
+    except OSError:
+        return index
 
 
 def data_dir():
@@ -87,7 +109,7 @@ class Api:
 
 
 def main():
-    index = find_index()
+    index = fresh_copy(find_index())
     win_kwargs = only_supported(
         webview.create_window,
         title=APP_NAME,

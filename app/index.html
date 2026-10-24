@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>window.DOSKA_APP=true;</script>
+<script>window.DOSKA_APP=true;window.DOSKA_VERSION="";</script>
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
@@ -171,14 +171,36 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .fhelp code{font:13px var(--math);color:var(--fg);background:var(--panel-2);padding:0 4px;border-radius:4px}
 /* gallery */
 #gallery{position:fixed;inset:0;z-index:45;background:var(--gal);overflow-y:auto}
-.gwrap{max-width:1180px;margin:0 auto;padding-block:calc(28px + env(safe-area-inset-top,0px)) 48px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
-.ghead{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.gwrap{max-width:1280px;margin:0 auto;padding-block:calc(22px + env(safe-area-inset-top,0px)) 48px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.ghead{display:flex;align-items:center;gap:14px}
 .glogo{width:40px;height:40px;border-radius:11px;background:var(--accent);color:#fff;display:grid;place-items:center;font:italic 26px var(--math);flex:none}
-.gtitle{flex:1;min-width:140px}
+.gbrand{display:flex;flex-direction:column;flex:1;min-width:0}
+.gbrand b{font-size:17px;font-weight:600}
+.gbrand span{font-size:12px;color:var(--muted)}
+#gsearch{width:min(420px,100%);padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--fg);font:inherit}
+#gsearch:focus{outline:none;border-color:var(--accent)}
+.gbody{display:grid;grid-template-columns:232px minmax(0,1fr);gap:28px;margin-top:26px;align-items:start}
+#gside{display:flex;flex-direction:column;gap:2px;position:sticky;top:0}
+.fitem{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:9px;text-align:left;min-width:0}
+.fitem:hover{background:var(--panel)}
+.fitem.on{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.fitem .fn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fitem .fc{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fitem svg.i{width:20px;height:20px;flex:none}
+.fitem.add{color:var(--muted);margin-top:4px}
+.fitem.add:hover{color:var(--accent)}
+.flabel{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:16px 10px 4px}
+.frowg{position:relative}
+.frowg .fm{position:absolute;right:2px;top:50%;transform:translateY(-50%);width:30px;height:30px;opacity:0}
+.frowg:hover .fm,.frowg .fm:focus-visible{opacity:1}
+.frowg:hover .fc{visibility:hidden}
+.av{width:24px;height:24px;border-radius:50%;background:var(--c);color:#fff;font-size:10.5px;font-weight:600;display:grid;place-items:center;flex:none;letter-spacing:.02em}
+.av.ghost{background:var(--line);color:var(--muted)}
+.gtitle{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .gtitle h1{margin:0;font-size:24px;font-weight:600;letter-spacing:-.01em}
 .gtitle span{font-size:13px;color:var(--muted)}
-#gsearch{width:min(280px,100%);padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--fg);font:inherit}
-.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;margin-top:24px}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin-top:16px}
+.ggrid .empty{grid-column:1/-1}
 .gcard{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:12px;text-align:left;min-width:0}
 .gcard:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:var(--shadow)}
 .gcard.cur{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -187,13 +209,40 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .gnew .thumb{display:grid;place-items:center;color:var(--accent);background:var(--accent-soft)}
 .gnew .thumb svg.i{width:40px;height:40px;stroke-width:1.5}
 .badge{position:absolute;left:8px;top:8px;background:var(--accent);color:#fff;font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px}
-.gcard .meta{display:flex;align-items:center;gap:6px;padding:10px 6px 10px 12px;min-height:58px}
+.gcard .meta{display:flex;align-items:center;gap:6px;padding:10px 6px 8px 12px;min-height:56px}
 .gcard .nm{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .gcard .nm b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gcard .nm small{font-size:12px;color:var(--muted)}
 .gcard .gm{width:34px;height:34px;flex:none}
-.gren{width:100%;padding:6px 8px;border:1px solid var(--accent);border-radius:7px;background:var(--panel);color:var(--fg);font:inherit}
-.gmenu{position:absolute;right:6px;bottom:52px;z-index:2;min-width:200px}
+.gtags{display:flex;flex-wrap:wrap;gap:4px;padding:0 10px 12px}
+.tag{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--panel-2);color:var(--fg);display:inline-flex;align-items:center;gap:5px;max-width:100%}
+.tag:hover{background:var(--accent-soft);color:var(--accent)}
+.tag.who{padding-left:3px}
+.tag .av{width:16px;height:16px;font-size:7.5px}
+.gmenu{position:absolute;right:6px;top:calc(100% - 8px);z-index:3;min-width:220px}
+.frowg .gmenu{right:0;top:100%}
+.fren{width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--fg);font:inherit}
+@media (max-width:760px){.gbody{grid-template-columns:1fr;gap:16px}#gside{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}.flabel{display:none}.fitem{width:auto;white-space:nowrap}.frowg .fm{display:none}}
+/* dialog */
+#dlg{position:fixed;inset:0;z-index:55;background:rgba(15,18,25,.4);display:grid;place-items:center;padding:16px}
+.dlgbox{position:relative;width:min(480px,100%);padding:22px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto}
+.dlgbox h2{margin:0;font-size:18px;font-weight:600}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted)}
+.fld input,.fld select{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);color:var(--fg);font:14px var(--ui);width:100%}
+.fld input:focus,.fld select:focus{outline:none;border-color:var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:460px){.row2{grid-template-columns:1fr}}
+.tagbox{display:flex;flex-wrap:wrap;gap:6px;padding:6px;border:1px solid var(--line);border-radius:9px;background:var(--panel-2);min-height:44px;cursor:text}
+.tagbox:focus-within{border-color:var(--accent)}
+.tagbox input{flex:1;min-width:130px;border:0;background:transparent;padding:4px 5px;color:var(--fg);font:14px var(--ui);outline:none}
+.chip{display:inline-flex;align-items:center;gap:2px;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:3px 3px 3px 10px;font-size:13px}
+.chip button{width:20px;height:20px;border-radius:50%;font-size:15px;line-height:1;color:inherit}
+.chip button:hover{background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.hint{font-size:12px;color:var(--muted);line-height:1.4}
+.dlgbtns{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+#boardBtn .bt{display:flex;flex-direction:column;align-items:flex-start;min-width:0;line-height:1.2}
+#boardSub{font-size:11.5px;color:var(--muted);font-weight:400}
+#boardSub:empty{display:none}
 button#logo{border:0;cursor:pointer}
 /* text editor */
 #ted{position:fixed;z-index:30;background:transparent;border:1px dashed var(--accent);outline:none;resize:none;overflow:hidden;padding:0;margin:0;white-space:pre;line-height:1.25;min-width:20px;-webkit-user-select:text;user-select:text}
@@ -244,7 +293,7 @@ button#logo{border:0;cursor:pointer}
 
 <div id="boardpill" class="float">
   <button id="logo" title="Все доски" aria-label="Все доски">∂</button>
-  <button id="boardBtn" title="Все доски"><span id="boardName">Доска</span><svg class="i" style="width:16px;height:16px"><use href="#i-down"/></svg></button>
+  <button id="boardBtn" title="Все доски"><span class="bt"><span id="boardName">Доска</span><small id="boardSub"></small></span><svg class="i" style="width:16px;height:16px"><use href="#i-down"/></svg></button>
   <span id="saved">Сохранено</span>
 </div>
 
@@ -302,12 +351,14 @@ button#logo{border:0;cursor:pointer}
 </aside>
 <section id="gallery" hidden aria-label="Мои доски">
   <div class="gwrap">
-    <header class="ghead"><div class="glogo" aria-hidden="true">∂</div><div class="gtitle"><h1>Мои доски</h1><span id="gcount"></span></div>
-      <input id="gsearch" type="search" placeholder="Найти доску" autocomplete="off" aria-label="Поиск по доскам">
+    <header class="ghead"><div class="glogo" aria-hidden="true">∂</div><div class="gbrand"><b>Доска</b><span id="gver"></span></div>
+      <input id="gsearch" type="search" placeholder="Поиск: название, ученик, тема урока" autocomplete="off" aria-label="Поиск по доскам">
       <button class="ib" id="gcloseBtn" title="Вернуться к доске (Esc)"><svg class="i"><use href="#i-x"/></svg></button></header>
-    <div class="ggrid" id="ggrid"></div>
+    <div class="gbody"><nav id="gside" aria-label="Ученики"></nav>
+      <div><div class="gtitle"><h1 id="gtitle">Все доски</h1><span id="gcount"></span></div><div class="ggrid" id="ggrid"></div></div></div>
   </div>
 </section>
+<div id="dlg" hidden><form id="dlgBox" class="float dlgbox" novalidate></form></div>
 <input type="file" id="fileIn" accept="application/pdf,image/*" hidden>
 <input type="file" id="boardIn" accept=".doska,application/json" hidden>
 <textarea id="ted" hidden spellcheck="false"></textarea>
@@ -843,6 +894,7 @@ const KEYS={KeyV:'select',KeyH:'hand',KeyP:'pen',KeyM:'marker',KeyE:'eraser',Key
 let prevTool=null;
 window.addEventListener('keydown',e=>{
   const inField=e.target.closest&&e.target.closest('input,textarea');
+  if(!$('#dlg').hidden)return;
   if(!$('#gallery').hidden){if(e.code==='Escape'&&board.id)closeGallery();return;}
   if(inField)return;
   const mod=e.ctrlKey||e.metaKey;
@@ -1031,6 +1083,7 @@ $('#moreBtn').onclick=()=>{if(!$('#menu').hidden){closeMenu();return;}
    ${window.DOSKA_APP?`<button class="mi" data-a="png"><svg class="i"><use href="#i-image"/></svg>Сохранить ${selection.size?'выделенное':'доску'} в PNG</button>
    <button class="mi" data-a="export"><svg class="i"><use href="#i-file"/></svg>Сохранить доску в файл</button>
    <button class="mi" data-a="import"><svg class="i"><use href="#i-file"/></svg>Открыть доску из файла</button>`:''}
+   <button class="mi" data-a="props"><svg class="i"><use href="#i-edit"/></svg>Свойства доски: дата, ученик, темы</button>
    <button class="mi" data-a="fit"><svg class="i"><use href="#i-fit"/></svg>Показать всё<small>Shift+1</small></button>
    <hr><button class="mi danger" data-a="clear"><svg class="i"><use href="#i-trash"/></svg>Очистить доску</button><div id="clearConfirm"></div>`,'right');};
 $('#menu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
@@ -1039,9 +1092,10 @@ $('#menu').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
   const a=b.dataset.a;
   if(a==='pen'){penMode=!penMode;ls.set('penMode',penMode);updatePenModeUI();b.classList.toggle('on',penMode);return;}
   if(a==='fit'){fitAll();closeMenu();return;}
+  if(a==='props'){closeMenu();if(board.id){saveNow({fast:true}).then(()=>openPropsDlg(board.id));}return;}
   if(a==='copyimg'){copyAsImage();closeMenu();return;}
   if(a==='png'){renderImageCanvas().then(c=>{if(!c)return toast('На доске пока пусто');c.toBlob(bl=>saveBlob(bl,safeName(board.name)+'.png'),'image/png');});closeMenu();return;}
-  if(a==='export'){saveNow();const data=JSON.stringify({doska:1,name:board.name,bg:board.bg,bgColor:board.bgColor,objects});saveBlob(new Blob([data],{type:'application/json'}),safeName(board.name)+'.doska');closeMenu();return;}
+  if(a==='export'){saveNow();const data=JSON.stringify({doska:1,name:board.name,date:board.date,tags:board.tags,bg:board.bg,bgColor:board.bgColor,objects});saveBlob(new Blob([data],{type:'application/json'}),safeName(board.name)+'.doska');closeMenu();return;}
   if(a==='import'){$('#boardIn').click();closeMenu();return;}
   if(a==='clear'){$('#clearConfirm').innerHTML=`<div class="confirm">Удалить всё с этой доски? Отменить можно через Ctrl+Z.<div class="row"><button class="btn dng" data-a="clearYes">Очистить</button><button class="btn" data-a="close">Оставить</button></div></div>`;return;}
   if(a==='clearYes'){objects=[];setSel([]);commit();closeMenu();return;}
@@ -1066,15 +1120,15 @@ function saveBlob(blob,name){const api=window.pywebview&&window.pywebview.api;
   if(api&&api.save_file){const r=new FileReader();r.onload=()=>{api.save_file(name,String(r.result).split(',')[1]).then(ok=>{if(ok)toast('Сохранено: '+ok);}).catch(()=>toast('Не удалось сохранить файл'));};r.readAsDataURL(blob);return;}
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);}
 async function importBoardFile(f){try{const d=JSON.parse(await f.text());if(!d||!Array.isArray(d.objects))throw 0;await saveNow();
-  const rec={id:uid(),name:d.name||f.name.replace(/\.doska$/i,''),bg:d.bg||'grid',bgColor:d.bgColor||'#ffffff',objects:d.objects.map(o=>Object.assign({},o,{id:uid()})),view:null,updated:Date.now()};
+  const rec={id:uid(),name:d.name||f.name.replace(/\.doska$/i,''),date:d.date||todayISO(),tags:d.tags||[],bg:d.bg||'grid',bgColor:d.bgColor||'#ffffff',objects:d.objects.map(o=>Object.assign({},o,{id:uid()})),view:null,updated:Date.now()};
   rec.objects.forEach(o=>{if(o.type==='stroke')o.bb=strokeBB(o);});applyBoard(rec);fitAll();await saveNow();toast('Доска открыта: '+rec.name);}catch(e){toast('Это не файл доски');}}
 async function copyAsImage(){const c=await renderImageCanvas();if(!c){toast('На доске пока пусто');return;}
   try{const blob=new Promise(r=>c.toBlob(r,'image/png'));await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);toast('Картинка в буфере обмена — вставьте её в мессенджер');}
   catch(e){toast('Браузер не разрешил скопировать картинку');}}
 
 /* ============ boards storage (IndexedDB) ============ */
-let db=null,boardsMeta=[];
-function idb(){return new Promise(res=>{try{const r=indexedDB.open('doska',2);r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('boards'))d.createObjectStore('boards',{keyPath:'id'});if(!d.objectStoreNames.contains('meta'))d.createObjectStore('meta',{keyPath:'id'});};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null);}catch(e){res(null)}});}
+let db=null,boardsMeta=[],folders=[];
+function idb(){return new Promise(res=>{try{const r=indexedDB.open('doska',3);r.onupgradeneeded=()=>{const d=r.result;for(const n of ['boards','meta','folders'])if(!d.objectStoreNames.contains(n))d.createObjectStore(n,{keyPath:'id'});};r.onsuccess=()=>res(r.result);r.onerror=()=>res(null);r.onblocked=()=>res(null);}catch(e){res(null)}});}
 function tx(mode,fn,store='boards'){return new Promise((res,rej)=>{if(!db)return res(null);const t=db.transaction(store,mode);const s=t.objectStore(store);const r=fn(s);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);});}
 function makeThumb(objs,bgc,pattern){const CW=480,CH=300;const c=document.createElement('canvas');c.width=CW;c.height=CH;const x=c.getContext('2d');
   const th=themeFor(bgc||'#ffffff');const saved={};for(const k in th)saved[k]=T[k];Object.assign(T,th);
@@ -1087,69 +1141,172 @@ function makeThumb(objs,bgc,pattern){const CW=480,CH=300;const c=document.create
 async function thumbFor(objs,bgc,pattern){const ims=objs.filter(o=>o.type==='image').map(o=>getImg(o.src)).filter(im=>!im.complete);
   if(ims.length)await Promise.race([Promise.all(ims.map(im=>new Promise(r=>{im.addEventListener('load',r,{once:true});im.addEventListener('error',r,{once:true});}))),new Promise(r=>setTimeout(r,1500))]);
   return makeThumb(objs,bgc,pattern);}
+
+/* dates */
+const pad2=n=>String(n).padStart(2,'0');
+function isoOf(t){const d=new Date(t);return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+const todayISO=()=>isoOf(Date.now());
+function dateOf(iso){const [y,m,d]=String(iso||todayISO()).split('-').map(Number);return new Date(y,(m||1)-1,d||1);}
+function dayDiff(dt){const n=new Date();const day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();return Math.round((day(n)-day(dt))/864e5);}
+function fmtLesson(iso){const dt=dateOf(iso),n=new Date();const base=dt.toLocaleDateString('ru-RU',dt.getFullYear()===n.getFullYear()?{day:'numeric',month:'long'}:{day:'numeric',month:'long',year:'numeric'});
+  const diff=dayDiff(dt);if(diff===0)return 'Сегодня, '+base;if(diff===1)return 'Вчера, '+base;if(diff===-1)return 'Завтра, '+base;return base+', '+dt.toLocaleDateString('ru-RU',{weekday:'short'});}
+function shortLesson(iso){return dateOf(iso).toLocaleDateString('ru-RU',{day:'numeric',month:'long'});}
+const norm=s=>String(s||'').toLowerCase().replace(/ё/g,'е');
+
 let saveT=null,lastThumbAt=0;
 function scheduleSave(quiet){clearTimeout(saveT);if(!quiet)$('#saved').textContent='Сохраняю…';saveT=setTimeout(()=>saveNow(),quiet?1500:700);}
 async function saveNow(opts={}){if(!board.id)return;clearTimeout(saveT);const id=board.id;
-  const rec={id,name:board.name,bg:board.bg,bgColor:board.bgColor,view:{x:view.x,y:view.y,z:view.z},updated:Date.now(),objects:objects.slice()};
+  const rec={id,name:board.name,bg:board.bg,bgColor:board.bgColor,date:board.date,tags:board.tags||[],folder:board.folder||null,view:{x:view.x,y:view.y,z:view.z},updated:Date.now(),objects:objects.slice()};
   try{await tx('readwrite',s=>s.put(rec));
-    let m=boardsMeta.find(b=>b.id===id);if(!m){m={id};boardsMeta.push(m);}m.name=rec.name;m.updated=rec.updated;m.count=objects.length;
+    let m=boardsMeta.find(b=>b.id===id);if(!m){m={id};boardsMeta.push(m);}Object.assign(m,{name:rec.name,updated:rec.updated,count:objects.length,date:rec.date,tags:rec.tags,folder:rec.folder});
     if(!opts.fast&&(opts.thumb||!m.thumb||Date.now()-lastThumbAt>5000)){lastThumbAt=Date.now();m.thumb=await thumbFor(rec.objects,rec.bgColor,rec.bg);}
     await tx('readwrite',s=>s.put(Object.assign({},m)),'meta');
     ls.set('current',id);$('#saved').textContent=db?'Сохранено':'Не сохраняется в этом окне';}
   catch(e){$('#saved').textContent='Не удалось сохранить';}}
-async function loadMeta(){if(!db){boardsMeta=[];return;}
+async function loadMeta(){if(!db){boardsMeta=[];folders=[];return;}
+  folders=(await tx('readonly',s=>s.getAll(),'folders'))||[];
   let metas=(await tx('readonly',s=>s.getAll(),'meta'))||[];const keys=(await tx('readonly',s=>s.getAllKeys()))||[];const have=new Set(metas.map(m=>m.id));
   for(const id of keys){if(have.has(id))continue;const r=await tx('readonly',s=>s.get(id));if(!r)continue;
-    const m={id,name:r.name||'Доска',updated:r.updated||Date.now(),count:(r.objects||[]).length,thumb:await thumbFor(r.objects||[],r.bgColor,r.bg)};await tx('readwrite',s=>s.put(m),'meta');metas.push(m);}
-  const keyset=new Set(keys);boardsMeta=metas.filter(m=>keyset.has(m.id));}
-async function switchBoard(id){if(id===board.id)return;await saveNow({thumb:true});const rec=await tx('readonly',s=>s.get(id));if(rec){applyBoard(rec);hideGraphPanel();}}
-function applyBoard(rec){board={id:rec.id,name:rec.name,bg:rec.bg||'grid',bgColor:rec.bgColor||'#ffffff'};applyBoardTheme();objects=(rec.objects||[]).map(o=>{if(o.type==='stroke'&&!o.bb)o.bb=strokeBB(o);return o;});hist={stack:[objects.slice()],idx:0};selection=new Set();
+    const m={id,name:r.name||'Доска',updated:r.updated||Date.now(),count:(r.objects||[]).length,date:r.date||isoOf(r.updated||Date.now()),tags:r.tags||[],folder:r.folder||null,thumb:await thumbFor(r.objects||[],r.bgColor,r.bg)};
+    await tx('readwrite',s=>s.put(m),'meta');metas.push(m);}
+  const keyset=new Set(keys),fids=new Set(folders.map(f=>f.id));
+  boardsMeta=metas.filter(m=>keyset.has(m.id));
+  for(const m of boardsMeta){if(!m.date)m.date=isoOf(m.updated||Date.now());if(!Array.isArray(m.tags))m.tags=[];if(m.folder&&!fids.has(m.folder))m.folder=null;}}
+async function switchBoard(id){if(id===board.id)return;if(board.id)await saveNow({thumb:true});const rec=await tx('readonly',s=>s.get(id));if(rec){applyBoard(rec);hideGraphPanel();}}
+function applyBoard(rec){const m=boardsMeta.find(b=>b.id===rec.id)||{};
+  board={id:rec.id,name:rec.name,bg:rec.bg||'grid',bgColor:rec.bgColor||'#ffffff',date:rec.date||m.date||isoOf(rec.updated||Date.now()),tags:rec.tags||m.tags||[],folder:rec.folder!==undefined?rec.folder:(m.folder||null)};
+  applyBoardTheme();objects=(rec.objects||[]).map(o=>{if(o.type==='stroke'&&!o.bb)o.bb=strokeBB(o);return o;});hist={stack:[objects.slice()],idx:0};selection=new Set();
   if(rec.view){view.x=rec.view.x;view.y=rec.view.y;view.z=rec.view.z;}else{view.z=1;view.x=-W/2;view.y=-H/2;}
-  $('#boardName').textContent=board.name;document.title=board.name+' — Доска';ls.set('current',board.id);updateHistUI();buildSelbar();dirtyAll();$('#saved').textContent=db?'Сохранено':'Не сохраняется в этом окне';}
-async function createBoard(name){if(board.id)await saveNow({thumb:true});let n=boardsMeta.length+1;while(boardsMeta.some(b=>b.name==='Урок '+n))n++;
-  const rec={id:uid(),name:name||('Урок '+n),bg:board.bg||'grid',bgColor:board.bgColor||'#ffffff',objects:[],view:null,updated:Date.now()};
+  updatePill();ls.set('current',board.id);updateHistUI();buildSelbar();dirtyAll();$('#saved').textContent=db?'Сохранено':'Не сохраняется в этом окне';}
+function updatePill(){$('#boardName').textContent=board.name||'Доска';document.title=(board.name||'Доска')+' — Доска';
+  const f=folders.find(x=>x.id===board.folder);$('#boardSub').textContent=(f?f.name+' · ':'')+(board.date?shortLesson(board.date):'');}
+async function createBoard(props={}){if(board.id)await saveNow({thumb:true});
+  const date=props.date||todayISO();
+  const rec={id:uid(),name:props.name||('Урок '+shortLesson(date)),date,tags:props.tags||[],folder:props.folder||null,bg:board.bg||'grid',bgColor:board.bgColor||'#ffffff',objects:[],view:null,updated:Date.now()};
   applyBoard(rec);view.z=1;view.x=-W/2;view.y=-H/2;await saveNow({thumb:true});}
 async function deleteBoardById(id){await tx('readwrite',s=>s.delete(id));await tx('readwrite',s=>s.delete(id),'meta');boardsMeta=boardsMeta.filter(b=>b.id!==id);
-  if(id===board.id){board.id=null;const next=[...boardsMeta].sort((a,b)=>b.updated-a.updated)[0];if(next){const rec=await tx('readonly',s=>s.get(next.id));if(rec)applyBoard(rec);else await createBoard('Урок 1');}else await createBoard('Урок 1');}}
-async function deleteBoard(){await deleteBoardById(board.id);}
+  if(id===board.id){board.id=null;objects=[];hist={stack:[[]],idx:0};selection=new Set();dirtyAll();}}
+async function deleteBoard(){const id=board.id;await deleteBoardById(id);openGallery();}
 async function duplicateBoard(id){if(id===board.id)await saveNow({thumb:true});const r=await tx('readonly',s=>s.get(id));const m0=boardsMeta.find(b=>b.id===id);if(!r)return;
   const nid=uid();const rec=Object.assign({},r,{id:nid,name:r.name+' — копия',updated:Date.now()});await tx('readwrite',s=>s.put(rec));
-  const m={id:nid,name:rec.name,updated:rec.updated,count:(rec.objects||[]).length,thumb:m0&&m0.thumb};await tx('readwrite',s=>s.put(m),'meta');boardsMeta.push(m);}
-async function renameBoard(id,name){name=name.trim().slice(0,80);if(!name)return;const m=boardsMeta.find(b=>b.id===id);
-  if(id===board.id){board.name=name;$('#boardName').textContent=name;document.title=name+' — Доска';await saveNow({fast:true});if(m)m.name=name;return;}
-  const r=await tx('readonly',s=>s.get(id));if(!r)return;r.name=name;await tx('readwrite',s=>s.put(r));if(m){m.name=name;await tx('readwrite',s=>s.put(Object.assign({},m)),'meta');}}
+  const m=Object.assign({},m0,{id:nid,name:rec.name,updated:rec.updated});await tx('readwrite',s=>s.put(m),'meta');boardsMeta.push(m);}
+async function updateBoardProps(id,props){const m=boardsMeta.find(b=>b.id===id);
+  if(id===board.id){Object.assign(board,props);updatePill();await saveNow({fast:true});return;}
+  const r=await tx('readonly',s=>s.get(id));if(!r)return;Object.assign(r,props);await tx('readwrite',s=>s.put(r));if(m){Object.assign(m,props);await tx('readwrite',s=>s.put(Object.assign({},m)),'meta');}}
+async function renameBoard(id,name){name=name.trim().slice(0,80);if(name)await updateBoardProps(id,{name});}
+
+/* folders (students) */
+const FCOL=['#2b59e0','#e5484d','#2a9d5a','#e8871e','#8b5cf6','#0ea5a4','#d946ef','#64748b'];
+async function createFolder(name){const f={id:uid(),name:name.trim().slice(0,60)||'Ученик',color:folders.length%FCOL.length,created:Date.now()};folders.push(f);await tx('readwrite',s=>s.put(f),'folders');return f;}
+async function renameFolder(id,name){const f=folders.find(x=>x.id===id);if(!f||!name.trim())return;f.name=name.trim().slice(0,60);await tx('readwrite',s=>s.put(Object.assign({},f)),'folders');updatePill();}
+async function deleteFolder(id){for(const m of boardsMeta.filter(b=>b.folder===id))await updateBoardProps(m.id,{folder:null});folders=folders.filter(f=>f.id!==id);await tx('readwrite',s=>s.delete(id),'folders');if(galFolder===id)galFolder='all';updatePill();}
+const initials=n=>String(n).trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+const avatar=f=>`<span class="av" style="--c:${FCOL[f.color%FCOL.length]}">${esc(initials(f.name))}</span>`;
 
 /* ---------- gallery ---------- */
-function fmtDate(t){const d=new Date(t),n=new Date();const hm=d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
-  const day=x=>new Date(x.getFullYear(),x.getMonth(),x.getDate()).getTime();const diff=Math.round((day(n)-day(d))/864e5);
-  if(diff===0)return 'Сегодня, '+hm;if(diff===1)return 'Вчера, '+hm;
-  return d.toLocaleDateString('ru-RU',d.getFullYear()===n.getFullYear()?{day:'numeric',month:'long'}:{day:'numeric',month:'long',year:'numeric'});}
+let galFolder='all';
 async function openGallery(){closeMenu();if(editingId)commitText();hideGraphPanel();$('#gallery').hidden=false;$('#gsearch').value='';renderGallery();
-  $('#gcloseBtn').hidden=!board.id;await saveNow({thumb:true});renderGallery();}
-function closeGallery(){$('#gallery').hidden=true;}
-function renderGallery(){const q=$('#gsearch').value.trim().toLowerCase();const list=boardsMeta.filter(b=>!q||(b.name||'').toLowerCase().includes(q)).sort((a,b)=>b.updated-a.updated);
-  $('#gcount').textContent=boardsMeta.length+' '+plural(boardsMeta.length,['доска','доски','досок']);
-  $('#ggrid').innerHTML=(q?'':`<button class="gcard gnew" data-g="new"><span class="thumb"><svg class="i"><use href="#i-plus"/></svg></span><span class="meta"><span class="nm"><b>Новая доска</b><small>Пустой урок</small></span></span></button>`)
-   +list.map(b=>`<div class="gcard${b.id===board.id?' cur':''}" data-id="${b.id}"><button class="thumb" data-g="open" title="Открыть «${esc(b.name)}»">${b.thumb?`<img src="${b.thumb}" alt="">`:''}${b.id===board.id?'<span class="badge">Сейчас открыта</span>':''}</button>
-     <div class="meta"><div class="nm"><b>${esc(b.name)}</b><small>${fmtDate(b.updated)}</small></div><button class="ib gm" data-g="more" title="Действия"><svg class="i"><use href="#i-more"/></svg></button></div></div>`).join('')
-   +(q&&!list.length?'<p class="empty">Досок с таким названием нет.</p>':'');}
+  if(board.id){await saveNow({thumb:true});renderGallery();}}
+function closeGallery(){if(!board.id)return;$('#gallery').hidden=true;closeDlg();}
 function plural(n,f){const a=n%10,b=n%100;return f[a===1&&b!==11?0:a>=2&&a<=4&&(b<10||b>=20)?1:2];}
+function allTags(){const m=new Map();for(const b of boardsMeta)for(const t of b.tags||[]){const k=norm(t);if(!m.has(k))m.set(k,t);}return [...m.values()].sort((a,b)=>a.localeCompare(b,'ru'));}
+function boardMatches(b,q){if(!q)return true;const f=folders.find(x=>x.id===b.folder);const hay=norm([b.name,(b.tags||[]).join(' '),f?f.name:'',fmtLesson(b.date)].join(' '));return norm(q).split(/\s+/).filter(Boolean).every(w=>hay.includes(w));}
+function renderGallery(){const q=$('#gsearch').value.trim();const searching=!!q;
+  const inFolder=b=>galFolder==='all'||(galFolder==='none'?!b.folder:b.folder===galFolder);
+  const list=boardsMeta.filter(b=>searching?boardMatches(b,q):inFolder(b)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||b.updated-a.updated);
+  const cnt=id=>boardsMeta.filter(b=>id==='all'||(id==='none'?!b.folder:b.folder===id)).length;
+  const fs=[...folders].sort((a,b)=>a.name.localeCompare(b.name,'ru'));
+  $('#gside').innerHTML=`<button class="fitem${galFolder==='all'&&!searching?' on':''}" data-f="all"><svg class="i"><use href="#i-lib"/></svg><span class="fn">Все доски</span><span class="fc">${cnt('all')}</span></button>
+    <div class="flabel">Ученики</div>
+    ${fs.map(f=>`<div class="frowg"><button class="fitem${galFolder===f.id&&!searching?' on':''}" data-f="${f.id}">${avatar(f)}<span class="fn">${esc(f.name)}</span><span class="fc">${cnt(f.id)}</span></button><button class="ib fm" data-fm="${f.id}" title="Изменить ученика"><svg class="i"><use href="#i-more"/></svg></button></div>`).join('')}
+    ${cnt('none')&&folders.length?`<button class="fitem${galFolder==='none'&&!searching?' on':''}" data-f="none"><span class="av ghost">—</span><span class="fn">Без ученика</span><span class="fc">${cnt('none')}</span></button>`:''}
+    <button class="fitem add" data-f="newfolder"><svg class="i"><use href="#i-plus"/></svg><span class="fn">Добавить ученика</span></button>`;
+  const cur=folders.find(f=>f.id===galFolder);
+  $('#gtitle').textContent=searching?'Поиск':cur?cur.name:galFolder==='none'?'Без ученика':'Все доски';
+  $('#gcount').textContent=searching?`Найдено: ${list.length}`:list.length+' '+plural(list.length,['доска','доски','досок']);
+  const tagBtn=t=>`<button class="tag" data-tag="${esc(t)}">${esc(t)}</button>`;
+  $('#ggrid').innerHTML=(searching?'':`<button class="gcard gnew" data-g="new"><span class="thumb"><svg class="i"><use href="#i-plus"/></svg></span><span class="meta"><span class="nm"><b>Новая доска</b><small>${cur?'для '+esc(cur.name):'Урок '+shortLesson(todayISO())}</small></span></span></button>`)
+   +list.map(b=>{const f=folders.find(x=>x.id===b.folder);return `<div class="gcard${b.id===board.id?' cur':''}" data-id="${b.id}"><button class="thumb" data-g="open" title="Открыть «${esc(b.name)}»">${b.thumb?`<img src="${b.thumb}" alt="">`:''}${b.id===board.id?'<span class="badge">Сейчас открыта</span>':''}</button>
+     <div class="meta"><div class="nm"><b>${esc(b.name)}</b><small>${esc(fmtLesson(b.date))}</small></div><button class="ib gm" data-g="more" title="Действия"><svg class="i"><use href="#i-more"/></svg></button></div>
+     ${(f&&(galFolder!==f.id||searching))||(b.tags||[]).length?`<div class="gtags">${f&&(galFolder!==f.id||searching)?`<button class="tag who" data-f="${f.id}">${avatar(f)}${esc(f.name)}</button>`:''}${(b.tags||[]).map(tagBtn).join('')}</div>`:''}</div>`;}).join('')
+   +(searching&&!list.length?`<p class="empty">Ничего не нашлось по запросу «${esc(q)}». Поиск идёт по названию, ученику, дате и темам урока.</p>`:'')
+   +(!searching&&!list.length&&cur?`<p class="empty">У ${esc(cur.name)} пока нет досок. Нажмите «Новая доска».</p>`:'');
+  $('#gcloseBtn').hidden=!board.id;
+  $('#gver').textContent=window.DOSKA_VERSION?'версия '+window.DOSKA_VERSION:'';}
 $('#gsearch').addEventListener('input',renderGallery);
+$('#gsearch').addEventListener('keydown',e=>{if(e.key==='Escape'&&e.target.value){e.stopPropagation();e.target.value='';renderGallery();}});
 $('#gcloseBtn').onclick=closeGallery;
-$('#ggrid').addEventListener('click',async e=>{const b=e.target.closest('[data-g]');if(!b){if(!e.target.closest('.gmenu'))document.querySelectorAll('.gmenu').forEach(m=>m.remove());return;}
+$('#gside').addEventListener('click',async e=>{const fm=e.target.closest('[data-fm]');
+  if(fm){const id=fm.dataset.fm;const f=folders.find(x=>x.id===id);const wrap=fm.closest('.frowg');const had=wrap.querySelector('.gmenu');document.querySelectorAll('.gmenu').forEach(m=>m.remove());if(had)return;
+    wrap.insertAdjacentHTML('beforeend',`<div class="gmenu float menu"><div style="padding:4px 6px 6px"><input type="text" class="fren" value="${esc(f.name)}" maxlength="60" aria-label="Имя ученика"></div><button class="mi" data-fa="save"><svg class="i"><use href="#i-edit"/></svg>Переименовать</button><hr><button class="mi danger" data-fa="del"><svg class="i"><use href="#i-trash"/></svg>Удалить ученика</button></div>`);
+    const inp=wrap.querySelector('.fren');inp.focus();inp.select();inp.addEventListener('keydown',ev=>{ev.stopPropagation();if(ev.key==='Enter')wrap.querySelector('[data-fa=save]').click();});return;}
+  const fa=e.target.closest('[data-fa]');
+  if(fa){const wrap=fa.closest('.frowg');const id=wrap.querySelector('[data-fm]').dataset.fm;const f=folders.find(x=>x.id===id);
+    if(fa.dataset.fa==='save'){await renameFolder(id,wrap.querySelector('.fren').value);renderGallery();return;}
+    if(fa.dataset.fa==='del'){wrap.querySelector('.gmenu').innerHTML=`<div class="confirm">Удалить ученика «${esc(f.name)}»? Его доски останутся, просто без ученика.<div class="row"><button class="btn dng" data-fa="delYes">Удалить</button><button class="btn" data-fa="no">Отмена</button></div></div>`;return;}
+    if(fa.dataset.fa==='delYes'){await deleteFolder(id);renderGallery();toast('Ученик удалён, доски сохранены');return;}
+    if(fa.dataset.fa==='no'){wrap.querySelector('.gmenu').remove();return;}}
+  const b=e.target.closest('[data-f]');if(!b)return;
+  if(b.dataset.f==='newfolder'){openFolderDlg();return;}
+  galFolder=b.dataset.f;$('#gsearch').value='';renderGallery();});
+$('#ggrid').addEventListener('click',async e=>{const tg=e.target.closest('[data-tag]');if(tg){$('#gsearch').value=tg.dataset.tag;renderGallery();return;}
+  const who=e.target.closest('.tag.who');if(who){galFolder=who.dataset.f;$('#gsearch').value='';renderGallery();return;}
+  const b=e.target.closest('[data-g]');if(!b){if(!e.target.closest('.gmenu'))document.querySelectorAll('.gmenu').forEach(m=>m.remove());return;}
   const card=b.closest('.gcard');const id=card&&card.dataset.id;const g=b.dataset.g;
-  if(g==='new'){await createBoard();closeGallery();toast('Новая доска создана');return;}
+  if(g==='new'){openPropsDlg(null);return;}
   if(g==='open'){if(id!==board.id)await switchBoard(id);closeGallery();return;}
   if(g==='more'){const had=card.querySelector('.gmenu');document.querySelectorAll('.gmenu').forEach(m=>m.remove());if(had)return;
-    card.insertAdjacentHTML('beforeend',`<div class="gmenu float menu"><button class="mi" data-g="rename"><svg class="i"><use href="#i-edit"/></svg>Переименовать</button><button class="mi" data-g="dup"><svg class="i"><use href="#i-copy"/></svg>Дублировать</button><hr><button class="mi danger" data-g="del"><svg class="i"><use href="#i-trash"/></svg>Удалить</button></div>`);return;}
-  if(g==='rename'){card.querySelector('.gmenu')?.remove();const nm=card.querySelector('.nm');const cur=boardsMeta.find(x=>x.id===id)?.name||'';nm.innerHTML=`<input type="text" class="gren" value="${esc(cur)}" maxlength="80" aria-label="Название доски">`;const inp=nm.querySelector('input');inp.focus();inp.select();
-    let done=false;const fin=async ok=>{if(done)return;done=true;if(ok)await renameBoard(id,inp.value);renderGallery();};
-    inp.addEventListener('keydown',ev=>{ev.stopPropagation();if(ev.key==='Enter')fin(true);if(ev.key==='Escape')fin(false);});inp.addEventListener('blur',()=>fin(true));return;}
+    card.insertAdjacentHTML('beforeend',`<div class="gmenu float menu"><button class="mi" data-g="props"><svg class="i"><use href="#i-edit"/></svg>Свойства: дата, ученик, темы</button><button class="mi" data-g="dup"><svg class="i"><use href="#i-copy"/></svg>Дублировать</button><hr><button class="mi danger" data-g="del"><svg class="i"><use href="#i-trash"/></svg>Удалить</button></div>`);return;}
+  if(g==='props'){card.querySelector('.gmenu')?.remove();openPropsDlg(id);return;}
   if(g==='dup'){await duplicateBoard(id);renderGallery();toast('Копия создана');return;}
   if(g==='del'){const m=card.querySelector('.gmenu');const name=boardsMeta.find(x=>x.id===id)?.name||'';m.innerHTML=`<div class="confirm">Удалить «${esc(name)}» насовсем?<div class="row"><button class="btn dng" data-g="delYes">Удалить</button><button class="btn" data-g="delNo">Отмена</button></div></div>`;return;}
   if(g==='delNo'){card.querySelector('.gmenu')?.remove();return;}
-  if(g==='delYes'){await deleteBoardById(id);renderGallery();$('#gcloseBtn').hidden=!board.id;toast('Доска удалена');return;}
+  if(g==='delYes'){await deleteBoardById(id);renderGallery();toast('Доска удалена');return;}
 });
+document.addEventListener('pointerdown',e=>{if(!e.target.closest('.gmenu,[data-g=more],[data-fm]'))document.querySelectorAll('.gmenu').forEach(m=>m.remove());},true);
+
+/* ---------- dialogs: board properties, new student ---------- */
+let dlgState=null;
+function closeDlg(){$('#dlg').hidden=true;dlgState=null;}
+function openFolderDlg(){dlgState={kind:'folder'};$('#dlgBox').innerHTML=`<h2>Новый ученик</h2>
+  <label class="fld">Имя ученика<input type="text" id="dFolder" maxlength="60" placeholder="Например, Маша Иванова" autocomplete="off"></label>
+  <div class="dlgbtns"><button type="button" class="btn" data-x>Отмена</button><button type="submit" class="btn pri">Добавить</button></div>`;
+  $('#dlg').hidden=false;setTimeout(()=>$('#dFolder').focus(),0);}
+function openPropsDlg(id){const m=id?boardsMeta.find(b=>b.id===id):null;const isNew=!m;
+  const folder=m?m.folder:(folders.some(f=>f.id===galFolder)?galFolder:null);const date=m?m.date:todayISO();
+  dlgState={kind:'props',id,tags:[...((m&&m.tags)||[])],nameTouched:!!m};
+  $('#dlgBox').innerHTML=`<h2>${isNew?'Новая доска':'Свойства доски'}</h2>
+   <label class="fld">Название<input type="text" id="dName" maxlength="80" value="${esc(m?m.name:'Урок '+shortLesson(date))}" autocomplete="off"></label>
+   <div class="row2"><label class="fld">Дата урока<input type="date" id="dDate" value="${date}"></label>
+    <label class="fld">Ученик<select id="dFolderSel"><option value="">Без ученика</option>${[...folders].sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(f=>`<option value="${f.id}"${f.id===folder?' selected':''}>${esc(f.name)}</option>`).join('')}<option value="__new">+ Новый ученик…</option></select></label></div>
+   <label class="fld" id="dNewWrap" hidden>Имя нового ученика<input type="text" id="dNewFolder" maxlength="60" autocomplete="off"></label>
+   <div class="fld">Темы урока<div class="tagbox" id="dTags"></div><span class="hint">Например: теорема Пифагора, ОГЭ 15, квадратные уравнения. Enter или запятая — добавить тему. По темам работает поиск.</span></div>
+   <datalist id="tagList">${allTags().map(t=>`<option value="${esc(t)}"></option>`).join('')}</datalist>
+   <div class="dlgbtns"><button type="button" class="btn" data-x>Отмена</button><button type="submit" class="btn pri">${isNew?'Создать и открыть':'Сохранить'}</button></div>`;
+  renderTagBox();$('#dlg').hidden=false;
+  $('#dName').addEventListener('input',()=>{dlgState.nameTouched=true;});
+  $('#dDate').addEventListener('change',()=>{if(!dlgState.nameTouched&&$('#dDate').value)$('#dName').value='Урок '+shortLesson($('#dDate').value);});
+  $('#dFolderSel').addEventListener('change',e=>{const n=e.target.value==='__new';$('#dNewWrap').hidden=!n;if(n)$('#dNewFolder').focus();});
+  setTimeout(()=>{(isNew?$('#dTagIn'):$('#dName')).focus();},0);}
+function renderTagBox(){const box=$('#dTags');if(!box)return;const keep=$('#dTagIn')?$('#dTagIn').value:'';
+  box.innerHTML=dlgState.tags.map((t,i)=>`<span class="chip">${esc(t)}<button type="button" data-rm="${i}" title="Убрать тему" aria-label="Убрать ${esc(t)}">×</button></span>`).join('')+`<input type="text" id="dTagIn" list="tagList" placeholder="${dlgState.tags.length?'ещё тема…':'теорема Пифагора'}" autocomplete="off">`;
+  const inp=$('#dTagIn');inp.value=keep;
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===','||e.key===';'){if(inp.value.trim()){e.preventDefault();addTag(inp.value);inp.value='';renderTagBox();$('#dTagIn').focus();}else if(e.key!=='Enter')e.preventDefault();}
+    else if(e.key==='Backspace'&&!inp.value&&dlgState.tags.length){dlgState.tags.pop();renderTagBox();$('#dTagIn').focus();}});
+  inp.addEventListener('change',()=>{if(allTags().some(t=>t===inp.value)){addTag(inp.value);inp.value='';renderTagBox();$('#dTagIn').focus();}});}
+function addTag(v){v=v.replace(/[,;]+$/,'').trim().slice(0,40);if(v&&!dlgState.tags.some(t=>norm(t)===norm(v)))dlgState.tags.push(v);}
+$('#dlg').addEventListener('click',e=>{if(e.target.id==='dlg'||e.target.closest('[data-x]'))closeDlg();const rm=e.target.closest('[data-rm]');if(rm){dlgState.tags.splice(+rm.dataset.rm,1);renderTagBox();$('#dTagIn').focus();}
+  if(e.target.id==='dTags')$('#dTagIn').focus();});
+$('#dlgBox').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')closeDlg();});
+$('#dlgBox').addEventListener('submit',async e=>{e.preventDefault();const st=dlgState;if(!st)return;
+  if(st.kind==='folder'){const n=$('#dFolder').value.trim();if(!n){$('#dFolder').focus();return;}const f=await createFolder(n);closeDlg();galFolder=f.id;renderGallery();return;}
+  if($('#dTagIn').value.trim())addTag($('#dTagIn').value);
+  let folder=$('#dFolderSel').value||null;
+  if(folder==='__new'){const n=$('#dNewFolder').value.trim();if(!n){$('#dNewFolder').focus();return;}folder=(await createFolder(n)).id;}
+  const props={name:$('#dName').value.trim()||('Урок '+shortLesson($('#dDate').value)),date:$('#dDate').value||todayISO(),folder,tags:st.tags.slice()};
+  closeDlg();
+  if(!st.id){await createBoard(props);closeGallery();toast('Доска создана');}
+  else{await updateBoardProps(st.id,props);if(!$('#gallery').hidden)renderGallery();toast('Свойства сохранены');}});
 $('#boardBtn').onclick=openGallery;
 $('#logo').onclick=openGallery;
 
@@ -1172,8 +1329,9 @@ async function boot(){resize();readTheme();setTool(tool);updatePenModeUI();updat
   db=await idb();await loadMeta();const cur=ls.get('current',null);
   const pick=boardsMeta.find(b=>b.id===cur)||[...boardsMeta].sort((a,b)=>b.updated-a.updated)[0];
   let rec=pick?await tx('readonly',s=>s.get(pick.id)):null;
-  if(!rec){rec={id:uid(),name:'Пример урока',bg:'grid',bgColor:'#ffffff',objects:seedExample(),view:null,updated:Date.now()};applyBoard(rec);fitAll();await saveNow({thumb:true});}
+  if(!rec){rec={id:uid(),name:'Пример урока',date:todayISO(),tags:['пример'],bg:'grid',bgColor:'#ffffff',objects:seedExample(),view:null,updated:Date.now()};applyBoard(rec);fitAll();await saveNow({thumb:true});}
   else applyBoard(rec);
+  openGallery();
   if(document.fonts){document.fonts.load('19px "STIX Two Text"');document.fonts.load('italic 19px "STIX Two Text"');document.fonts.load('16px "Golos Text"');document.fonts.ready.then(()=>{textCache=new WeakMap();dirtyAll();renderLibThumbs();});}
   window.addEventListener('pagehide',()=>saveNow({fast:true}));document.addEventListener('visibilitychange',()=>{if(document.hidden)saveNow({fast:true});});}
 boot();
