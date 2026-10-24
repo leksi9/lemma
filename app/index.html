@@ -236,6 +236,13 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .chk input{width:18px;height:18px;accent-color:var(--accent)}
 #cpanel{animation:slideR .22s var(--ease)}#cpanel.leaving{animation:slideROut .16s ease-in forwards}
 /* graph panel */
+#npanel{right:max(12px,env(safe-area-inset-right,0px));z-index:22;width:min(320px,calc(100vw - 90px));bottom:auto;animation:slideR .22s var(--ease)}
+#npanel.leaving{animation:slideROut .16s ease-in forwards}
+.npb{display:flex;flex-direction:column;gap:6px}
+.npb .r3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.npb .r3 label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted)}
+.npb input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2);color:var(--fg);font:15px var(--ui);font-variant-numeric:tabular-nums}
+.npb input:focus{outline:none;border-color:var(--accent);background:var(--panel)}
 #gpanel{right:max(12px,env(safe-area-inset-right,0px));z-index:22;width:min(330px,calc(100vw - 90px))}
 .frows{display:flex;flex-direction:column}
 .frow{display:grid;grid-template-columns:24px 1fr 32px;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
@@ -505,6 +512,15 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
     <pre id="cOut" hidden></pre>
   </div>
 </aside>
+<aside id="npanel" class="float panel" hidden aria-label="Числовая прямая">
+  <div class="ph"><h2>Числовая прямая</h2><button class="ib" id="nclose" title="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="pb npb">
+    <div class="r3"><label>От<input type="number" id="nMin" step="any"></label><label>До<input type="number" id="nMax" step="any"></label><label>Шаг<input type="number" id="nStep" step="any" min="0"></label></div>
+    <label class="clbl" for="nDots">Закрашенные точки</label><input type="text" id="nDots" placeholder="например  −2; 3" autocomplete="off">
+    <label class="clbl" for="nHoles">Выколотые точки</label><input type="text" id="nHoles" placeholder="например  1; 4,5" autocomplete="off">
+    <span class="hint">Точки перечисляйте через точку с запятой. Можно писать дроби и корни: 1/2; sqrt(2). Длину прямой меняйте, растягивая её за углы рамки.</span>
+  </div>
+</aside>
 <aside id="gpanel" class="float panel" hidden aria-label="Функции на плоскости">
   <div class="ph"><h2>Функции</h2><button class="ib" id="gclose" title="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div>
   <div class="pb" id="gbody"></div>
@@ -651,9 +667,10 @@ function drawImage(ctx,o){const im=getImg(o.src);ctx.save();const t=orient(ctx,o
 
 /* ============ figures library ============ */
 const LABEL_FONT='italic 19px "STIX Two Text", "Times New Roman", serif';
-function poly(ctx,pts,close=true){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);if(close)ctx.closePath();ctx.stroke();}
-function seg(ctx,a,b,dash){ctx.setLineDash(dash?[7,6]:[]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();ctx.setLineDash([]);}
-function lab(ctx,t,p,c,d=15){const dx=p[0]-c[0],dy=p[1]-c[1],L=Math.hypot(dx,dy)||1;ctx.fillText(t,p[0]+dx/L*d,p[1]+dy/L*d);}
+let FIGREC=null;
+function poly(ctx,pts,close=true){if(FIGREC){for(let i=0;i<pts.length-(close?0:1);i++){const a=pts[i],b=pts[(i+1)%pts.length];FIGREC.segs.push([a[0],a[1],b[0],b[1]]);}}ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);if(close)ctx.closePath();ctx.stroke();}
+function seg(ctx,a,b,dash){if(FIGREC)FIGREC.segs.push([a[0],a[1],b[0],b[1]]);ctx.setLineDash(dash?[7,6]:[]);ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(b[0],b[1]);ctx.stroke();ctx.setLineDash([]);}
+function lab(ctx,t,p,c,d=15){if(FIGREC){FIGREC.labs.push({t,p,c});return;}const dx=p[0]-c[0],dy=p[1]-c[1],L=Math.hypot(dx,dy)||1;ctx.fillText(t,p[0]+dx/L*d,p[1]+dy/L*d);}
 function dot(ctx,p,r=3){ctx.beginPath();ctx.arc(p[0],p[1],r,0,Math.PI*2);ctx.fill();}
 function rightMark(ctx,p,u,v,s=13){ctx.beginPath();ctx.moveTo(p[0]+u[0]*s,p[1]+u[1]*s);ctx.lineTo(p[0]+(u[0]+v[0])*s,p[1]+(u[1]+v[1])*s);ctx.lineTo(p[0]+v[0]*s,p[1]+v[1]*s);ctx.stroke();}
 function unit(a,b){const dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1;return [dx/l,dy/l];}
@@ -761,6 +778,17 @@ TB.fsu={title:'Формулы сокращённого умножения',cols:
 TB.si={title:'Приставки СИ',cols:[110,80,100],rows:[['Приставка','Обозн.','Множитель'],['гига','Г','10⁹'],['мега','М','10⁶'],['кило','к','10³'],['санти','с','10⁻²'],['милли','м','10⁻³'],['микро','мк','10⁻⁶'],['нано','н','10⁻⁹']]};
 TB.consts={title:'Физические постоянные',cols:[210,170],left:true,hRows:0,rows:[['Ускорение свободного падения','g = 9,8 м/с²'],['Гравитационная постоянная','G = 6,67·10⁻¹¹ Н·м²/кг²'],['Скорость света','c = 3·10⁸ м/с'],['Заряд электрона','e = 1,6·10⁻¹⁹ Кл'],['Постоянная Больцмана','k = 1,38·10⁻²³ Дж/К'],['Газовая постоянная','R = 8,31 Дж/(моль·К)'],['Число Авогадро','Nₐ = 6,02·10²³ моль⁻¹']]};
 
+function numParams(o){const p=Object.assign({min:-5,max:5,step:1,dots:'',holes:''},o.params||{});if(!(p.max>p.min))p.max=p.min+1;if(!(p.step>0))p.step=1;
+  const cnt=(p.max-p.min)/p.step;if(cnt>400)p.step=(p.max-p.min)/400;return p;}
+function parseNums(s){return String(s||'').split(/[;\s]+/).map(t=>t.trim().replace(',','.').replace('−','-')).filter(Boolean).map(t=>{try{return compileFn(t)(0);}catch(e){return NaN;}}).filter(isFinite);}
+function fmtTick(v){const r=Math.round(v*1000)/1000;return String(r).replace('.',',').replace('-','−');}
+function drawNumline(c,w,h,o){const p=numParams(o),y=h/2,x0=14,x1=w-30;const X=v=>x0+(v-p.min)/(p.max-p.min)*(x1-x0);
+  c.lineWidth=1.8;arrowLine(c,[0,y],[w,y]);c.font='15px "Golos Text", sans-serif';c.textAlign='center';c.textBaseline='top';
+  const n=Math.round((p.max-p.min)/p.step),px=(x1-x0)/Math.max(1,n);const every=Math.max(1,Math.ceil(30/Math.max(px,1e-6)));
+  for(let i=0;i<=n;i++){const v=p.min+i*p.step,x=X(v);c.lineWidth=1.4;seg(c,[x,y-(i%every?4:6)],[x,y+(i%every?4:6)]);if(i%every===0)c.fillText(fmtTick(v),x,y+9);}
+  c.lineWidth=2;for(const v of parseNums(p.dots))if(v>=p.min-1e-9&&v<=p.max+1e-9){c.beginPath();c.arc(X(v),y,5.5,0,7);c.fill();}
+  for(const v of parseNums(p.holes))if(v>=p.min-1e-9&&v<=p.max+1e-9){c.save();c.fillStyle=T.board;c.beginPath();c.arc(X(v),y,5.5,0,7);c.fill();c.stroke();c.restore();}
+  c.font=LABEL_FONT;c.textBaseline='bottom';c.textAlign='center';c.fillText('x',w-8,y-4);}
 function unitCircle(ctx,w,h,o){const s=Math.min(w,h)/560;ctx.save();ctx.translate((w-560*s)/2,(h-560*s)/2);ctx.scale(s,s);
   const C=[280,280],R=190;ctx.lineWidth=1.6;
   arrowLine(ctx,[40,280],[525,280]);arrowLine(ctx,[280,520],[280,35]);
@@ -770,10 +798,12 @@ function unitCircle(ctx,w,h,o){const s=Math.min(w,h)/560;ctx.save();ctx.translat
   ctx.lineWidth=1;
   for(const [a,t] of angs){const r=a*Math.PI/180;const P=[C[0]+R*Math.cos(r),C[1]-R*Math.sin(r)];
     if(a>0&&a<90){ctx.globalAlpha=.5;seg(ctx,C,P);seg(ctx,P,[P[0],C[1]],true);seg(ctx,P,[C[0],P[1]],true);ctx.globalAlpha=1;}
-    dot(ctx,P,3.5);const L=[C[0]+(R+30)*Math.cos(r),C[1]-(R+26)*Math.sin(r)];ctx.fillText(t,L[0],L[1]);}
+    dot(ctx,P,3.5);
+    if(a%90===0){const at={0:[C[0]+R+12,C[1]-14,'left'],90:[C[0]+12,C[1]-R-16,'left'],180:[C[0]-R-12,C[1]-14,'right'],270:[C[0]+12,C[1]+R+18,'left']}[a];ctx.textAlign=at[2];ctx.fillText(t,at[0],at[1]);ctx.textAlign='center';}
+    else{const L=[C[0]+(R+30)*Math.cos(r),C[1]-(R+26)*Math.sin(r)];ctx.fillText(t,L[0],L[1]);}}
   ctx.font='14px "STIX Two Text", serif';
   [[.5,'1/2'],[Math.SQRT1_2,'√2/2'],[Math.sqrt(3)/2,'√3/2']].forEach(([v,t],i)=>{ctx.textAlign='center';ctx.textBaseline='top';ctx.fillText(t,C[0]+R*v,C[1]+6+(i%2)*15);ctx.textAlign='right';ctx.textBaseline='middle';ctx.fillText(t,C[0]-6,C[1]-R*v);});
-  ctx.font=LABEL_FONT;ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('cos',490,288);ctx.textBaseline='middle';ctx.fillText('sin',290,40);ctx.textAlign='right';ctx.textBaseline='top';ctx.fillText('O',274,284);ctx.textAlign='left';ctx.fillText('1',C[0]+R+4,284);
+  ctx.font=LABEL_FONT;ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText('cos',490,288);ctx.textBaseline='middle';ctx.fillText('sin',290,40);ctx.textAlign='right';ctx.textBaseline='top';ctx.fillText('O',274,284);ctx.textAlign='left';ctx.fillText('1',C[0]+R+5,285);
   ctx.restore();}
 
 const FIGS={
@@ -826,8 +856,7 @@ const FIGS={
  graph:{g:'coord',name:'Координатная плоскость',w:420,h:340,draw:drawGraph,params:{fns:[],xmin:-6,xmax:6,ymin:-5,ymax:5}},
  graphEx:{g:'coord',as:'graph',name:'График функции',w:420,h:340,draw:drawGraph,params:{fns:[{e:'x^2 - 2x - 3',c:0}],xmin:-5,xmax:6,ymin:-5,ymax:7}},
  plane:{g:'_',name:'Координатная плоскость',w:360,h:320,draw:drawGraph,params:{fns:[],xmin:-6,xmax:6,ymin:-5,ymax:5}},
- numline:{g:'coord',name:'Числовая прямая',w:420,h:60,draw(c,w,h){const y=h/2;c.lineWidth=1.8;arrowLine(c,[0,y],[w,y]);const n=11,st=(w-30)/(n-1);c.font='15px "Golos Text", sans-serif';c.textAlign='center';c.textBaseline='top';
-  for(let i=0;i<n;i++){const x=10+i*st;seg(c,[x,y-6],[x,y+6]);c.fillText(String(i-5).replace('-','−'),x,y+9);}c.font=LABEL_FONT;c.textBaseline='bottom';c.fillText('x',w-8,y-4);}},
+ numline:{g:'coord',name:'Числовая прямая',w:420,h:60,draw:drawNumline,params:{min:-5,max:5,step:1,dots:'',holes:''}},
  ucircle:{g:'coord',name:'Единичная окружность',w:460,h:460,uni:true,draw:unitCircle},
  // tables
  squares:{g:'tab',name:'Таблица квадратов',uni:true,table:'squares'},
@@ -849,10 +878,31 @@ function orient(ctx,o){const rot=((o.rot|0)%4+4)%4,fx=o.fx===-1?-1:1,fy=o.fy===-
   ctx.translate(o.x+o.w/2,o.y+o.h/2);if(o.ang)ctx.rotate(o.ang);if(rot)ctx.rotate(rot*Math.PI/2);if(fx<0||fy<0)ctx.scale(fx,fy);ctx.translate(-iw/2,-ih/2);return {rot:rot+(o.ang||0)/(Math.PI/2),fx,fy,iw,ih,turned:rot||o.ang||fx<0||fy<0};}
 function drawFig(ctx,o){const f=FIGS[o.kind];if(!f)return;ctx.save();const t=orient(ctx,o);
   ctx.strokeStyle=ctx.fillStyle=col(o.color);ctx.lineWidth=o.lw||2.2;ctx.lineCap='round';ctx.lineJoin='round';ctx.font=LABEL_FONT;ctx.textAlign='center';ctx.textBaseline='middle';
-  const noLab=LABELABLE.has(f.g)&&!o.labels;
+  const noLab=LABELABLE.has(f.g)&&!o.labels;const halo=HALO_G.has(f.g)||o.kind==='ucircle'||o.kind==='numline';
   if(noLab)ctx.fillText=()=>{};
-  else if(t.turned){const ft=CanvasRenderingContext2D.prototype.fillText;ctx.fillText=function(txt,x,y,mw){this.save();this.translate(x,y);this.scale(t.fx,t.fy);this.rotate(-t.rot*Math.PI/2);ft.call(this,txt,0,0,mw);this.restore();};}
-  try{f.draw(ctx,t.iw,t.ih,o);}catch(e){}delete ctx.fillText;ctx.restore();}
+  else if(t.turned||halo){const ft=CanvasRenderingContext2D.prototype.fillText,st=CanvasRenderingContext2D.prototype.strokeText;
+    ctx.fillText=function(txt,x,y,mw){this.save();this.translate(x,y);if(t.turned){this.scale(t.fx,t.fy);this.rotate(-t.rot*Math.PI/2);}
+      if(halo){this.save();this.strokeStyle=T.board;this.lineWidth=4.5;this.lineJoin='round';this.setLineDash([]);st.call(this,txt,0,0);this.restore();}ft.call(this,txt,0,0,mw);this.restore();};}
+  const smart=LABELABLE.has(f.g)&&o.labels;if(smart)FIGREC={segs:[],labs:[]};
+  try{f.draw(ctx,t.iw,t.ih,o);}catch(e){}
+  if(smart){const rec=FIGREC;FIGREC=null;try{placeLabels(ctx,rec,o.kind+'|'+Math.round(t.iw)+'|'+Math.round(t.ih));}catch(e){}}
+  delete ctx.fillText;ctx.restore();}
+const HALO_G=new Set(['plan','stereo','phys']);
+/* vertex letters: try spots around the vertex, keep the one farthest from lines and other letters */
+const labelCache=new Map();
+function placeLabels(ctx,rec,key){if(!rec||!rec.labs.length)return;let pos=labelCache.get(key);
+  if(!pos||pos.length!==rec.labs.length){pos=[];const boxes=[];const segs=rec.segs;
+    const clear=(x,y)=>{let m=Infinity;for(const s of segs){const d=distSeg(x,y,s[0],s[1],s[2],s[3]);if(d<m)m=d;}return m;};
+    for(const L of rec.labs){const w=ctx.measureText(L.t).width,h=17;const ax=L.p[0]-L.c[0],ay=L.p[1]-L.c[1],al=Math.hypot(ax,ay)||1;let best=null;
+      for(let k=0;k<24;k++){const a=k*Math.PI/12,dx=Math.cos(a),dy=Math.sin(a);const ext=Math.abs(dx)*w/2+Math.abs(dy)*h/2;
+        for(const gap of [5,9,14]){const cx=L.p[0]+dx*(ext+gap),cy=L.p[1]+dy*(ext+gap);
+          let c=Infinity;for(const [px,py] of [[cx,cy],[cx-w/2,cy-h/2],[cx+w/2,cy-h/2],[cx-w/2,cy+h/2],[cx+w/2,cy+h/2],[cx,cy-h/2],[cx,cy+h/2],[cx-w/2,cy],[cx+w/2,cy]])c=Math.min(c,clear(px,py));
+          let pen=0;for(const b of boxes)if(Math.abs(b[0]-cx)<(b[2]+w)/2+3&&Math.abs(b[1]-cy)<(b[3]+h)/2+2)pen+=60;
+          const sc=Math.min(c,10)+2.2*(dx*ax+dy*ay)/al-(gap-5)*0.25-pen;if(!best||sc>best.sc)best={sc,cx,cy};}}
+      boxes.push([best.cx,best.cy,w,h]);pos.push([best.cx,best.cy]);}
+    if(labelCache.size>300)labelCache.clear();labelCache.set(key,pos);}
+  const ta=ctx.textAlign,tb=ctx.textBaseline;ctx.textAlign='center';ctx.textBaseline='middle';
+  rec.labs.forEach((L,i)=>ctx.fillText(L.t,pos[i][0],pos[i][1]));ctx.textAlign=ta;ctx.textBaseline=tb;}
 const LABELABLE=new Set(['plan','stereo']);
 
 /* ============ generic object ops ============ */
@@ -997,7 +1047,7 @@ function setSel(ids){selection=new Set(ids);dirtyAll();buildSelbar();}
 function positionSelbar(){const bar=$('#selbar');if(!selection.size||drag||editingId){bar.hidden=true;return;}const b=selBB();if(!b){bar.hidden=true;return;}
   const [x1,y1]=toScreen(b.x,b.y),[x2]=toScreen(b.x+b.w,b.y);bar.hidden=false;const bw=bar.offsetWidth;
   let cx=clamp((x1+x2)/2,bw/2+8,W-bw/2-8),cy=y1-12;if(cy<70){const [,y2]=toScreen(b.x,b.y+b.h);cy=Math.min(H-70,y2+12+bar.offsetHeight);}bar.style.left=cx+'px';bar.style.top=cy+'px';}
-function buildSelbar(){_buildSelbar();syncGraphPanel();syncCodePanel();}
+function buildSelbar(){_buildSelbar();syncGraphPanel();syncCodePanel();syncNumPanel();}
 function _buildSelbar(){const bar=$('#selbar');const objs=selObjs();if(!objs.length){bar.hidden=true;return;}
   const colorable=objs.some(o=>o.type!=='image');const hlOnly=objs.every(o=>o.hl);
   let h='';if(colorable){const pal=hlOnly?Object.keys(HL):Object.keys(PAL);const cur=objs[0].color;h+=pal.map(c=>`<button class="sw${cur===c?' on':''}" data-c="${c}" title="Цвет"><i style="background:${col(c)}"></i></button>`).join('')+'<span class="sep" style="width:1px;height:22px;background:var(--line);margin:0 4px"></span>';}
@@ -1222,7 +1272,7 @@ window.addEventListener('keydown',e=>{
   if(e.shiftKey&&e.code==='Digit1'){fitAll();return;}
   if(e.shiftKey&&selection.size&&(e.code==='KeyR'||e.code==='KeyH'||e.code==='KeyV')){e.preventDefault();turnSel(e.code==='KeyR'?'rot':e.code==='KeyH'?'flipH':'flipV');return;}
   if(e.code==='Delete'||e.code==='Backspace'){deleteSel();return;}
-  if(e.code==='Escape'){if(returnTool){const back=returnTool;setSel([]);setTool(back);return;}if(tool!=='select'){setTool('select');return;}setSel([]);closePanels();closeMenu();hideGraphPanel();hideCodePanel();return;}
+  if(e.code==='Escape'){if(returnTool){const back=returnTool;setSel([]);setTool(back);return;}if(tool!=='select'){setTool('select');return;}setSel([]);closePanels();closeMenu();hideGraphPanel();hideCodePanel();hideNumPanel();return;}
   if(e.code==='KeyG'){toggleLib();return;}
   if(KEYS[e.code])setTool(KEYS[e.code]);
   const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
@@ -1334,7 +1384,15 @@ function syncGraphPanel(){const objs=selObjs();const one=objs.length===1&&isGrap
 function hideGraphPanel(){flushGraphCommit();gpId=null;hideAnim($('#gpanel'),160);}
 function flushGraphCommit(){if(gCommitT){clearTimeout(gCommitT);gCommitT=null;commit();}}
 function refreshCodePanel(){if(cpId&&!$('#cpanel').hidden){const o=byId(cpId);if(!o){hideCodePanel();return;}if(document.activeElement!==$('#cCode'))$('#cCode').value=o.code||'';if(document.activeElement!==$('#cIn'))$('#cIn').value=o.inp||'';updateCodePanelRun();}}
-function refreshGraphPanel(){refreshCodePanel();if(gpId&&!$('#gpanel').hidden){if(byId(gpId))renderGraphPanel();else hideGraphPanel();}}
+let npId=null,nCommitT=null;
+function syncNumPanel(){const objs=selObjs();const one=objs.length===1&&objs[0].type==='fig'&&objs[0].kind==='numline'?objs[0]:null;
+  if(one){if(npId!==one.id||$('#npanel').hidden)openNumPanel(one.id);}else hideNumPanel();}
+function hideNumPanel(){if(nCommitT){clearTimeout(nCommitT);nCommitT=null;commit();}npId=null;hideAnim($('#npanel'),160);}
+function openNumPanel(id){const o=byId(id);if(!o)return;npId=id;const p=numParams(o);$('#nMin').value=p.min;$('#nMax').value=p.max;$('#nStep').value=+p.step.toFixed(6);$('#nDots').value=p.dots;$('#nHoles').value=p.holes;showEl($('#npanel'));}
+function updateNum(){const o=npId&&byId(npId);if(!o)return;const mn=parseFloat($('#nMin').value),mx=parseFloat($('#nMax').value),st=parseFloat($('#nStep').value);
+  const p=Object.assign({},numParams(o),{dots:$('#nDots').value,holes:$('#nHoles').value});if(isFinite(mn))p.min=mn;if(isFinite(mx))p.max=mx;if(isFinite(st)&&st>0)p.step=st;
+  replaceObjs(new Map([[o.id,Object.assign({},o,{params:p})]]));dirtyAll();clearTimeout(nCommitT);nCommitT=setTimeout(()=>{nCommitT=null;commit();},600);scheduleSave();}
+function refreshGraphPanel(){refreshCodePanel();if(npId&&!$('#npanel').hidden){if(byId(npId))openNumPanel(npId);else hideNumPanel();}if(gpId&&!$('#gpanel').hidden){if(byId(gpId))renderGraphPanel();else hideGraphPanel();}}
 function openGraphPanel(id,focus){flushGraphCommit();gpId=id;showEl($('#gpanel'));renderGraphPanel();if(focus){const ins=[...document.querySelectorAll('#gbody .fin')];const t=ins.find(i=>!i.value)||ins[ins.length-1];t&&t.focus();}}
 function gParams(o){const p=JSON.parse(JSON.stringify(o.params||{}));p.fns=graphItems(o.params).map((it,i)=>({e:it.e,c:it.c??i,h:!!it.h}));['xmin','xmax','ymin','ymax'].forEach((k,i)=>{if(!isFinite(p[k]))p[k]=[-6,6,-5,5][i];});return p;}
 function updateGraph(mut,live){const o=gpObj();if(!o)return;const p=gParams(o);mut(p);replaceObjs(new Map([[o.id,Object.assign({},o,{params:p})]]));dirtyAll();
@@ -1900,6 +1958,9 @@ window.onUpdateFailed=msg=>{updBusy=false;$('#updBar').hidden=true;$('#updTitle'
   $('#updGo').hidden=false;$('#updGo').textContent='Повторить';$('#updLater').hidden=false;};
 function scheduleUpdateCheck(){if(!window.DOSKA_APP)return;const go=()=>setTimeout(()=>checkUpdates(false),2500);
   if(updApi())go();else window.addEventListener('pywebviewready',go,{once:true});}
+
+for(const id of ['nMin','nMax','nStep','nDots','nHoles']){$('#'+id).addEventListener('input',updateNum);$('#'+id).addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape'||e.key==='Enter')e.target.blur();});}
+$('#nclose').onclick=()=>hideNumPanel();$('#npanel').addEventListener('pointerdown',e=>e.stopPropagation());
 
 /* ============ example board ============ */
 function seedExample(){const o=[];const add=x=>{x.id=uid();o.push(x);return x;};
