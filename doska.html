@@ -181,6 +181,56 @@ svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stro
 .dragghost.cancel{animation:fadeOut .18s ease-in forwards}
 .litem.dragging{opacity:.45}
 .litem,.tplins{touch-action:none}
+/* settings */
+.dlgbox.wide{width:min(600px,100%);gap:4px;padding:18px 22px 20px}
+.sthead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.stsec{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-top:1px solid var(--line)}
+.stsec h3{margin:0 0 6px;font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.strow{display:flex;align-items:center;gap:12px;padding:6px 10px}
+.strow.col{flex-direction:column;align-items:stretch;gap:8px}
+.strow .seg{margin:0}.strow .bgrow{padding:0}
+.stl{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;text-align:left}
+.stl b{font-weight:500;font-size:14px;color:var(--fg)}.stl span{font-size:12.5px;color:var(--muted);line-height:1.4}
+.stsec .toggle{align-items:center}
+.stbtns{display:flex;gap:6px;flex:none}
+.stnew{font-style:normal;color:var(--accent);font-weight:500}
+.stfoot{margin:6px 0 0;font-size:12px;color:var(--muted)}
+.gleft{display:flex;flex-direction:column;gap:16px;position:sticky;top:0;align-self:start}
+#gside{position:static}
+.gupd{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel);text-align:left}
+.gupd:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.gupd span{display:flex;flex-direction:column;gap:1px;min-width:0}.gupd b{font-weight:500;font-size:13.5px}.gupd small{font-size:12px;color:var(--muted)}
+.gupd svg.i{width:20px;height:20px;color:var(--muted);flex:none}
+.gupd.new{border-color:var(--accent);background:var(--accent-soft)}.gupd.new svg.i,.gupd.new b{color:var(--accent)}
+.gupd.new{animation:updPulse 2.4s ease-in-out infinite}@keyframes updPulse{50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}}
+@media (max-width:760px){.gleft{position:static}}
+/* calculator */
+#calc{right:max(84px,env(safe-area-inset-right,0px));top:calc(70px + env(safe-area-inset-top,0px));width:320px;z-index:40;display:flex;flex-direction:column;overflow:hidden;animation:popIn .22s var(--spring)}
+#calc.leaving{animation:popOut .15s ease-in forwards}
+.calhead{display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;cursor:move;touch-action:none;border-bottom:1px solid var(--line)}
+.calhead b{flex:1;font-weight:600}.calhead .ib{width:32px;height:32px}
+.calmode{font-size:12px;padding:4px 9px;border-radius:999px;background:var(--panel-2);color:var(--muted)}
+.calmode:hover{color:var(--accent)}
+.caldisp{padding:12px 14px 8px;display:flex;flex-direction:column;gap:2px}
+#calcIn{width:100%;border:0;background:none;color:var(--fg);font:22px var(--math);padding:2px 0;outline:none;-webkit-user-select:text;user-select:text}
+#calcOut{min-height:28px;font:18px var(--math);color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#calcOut.ok b{color:var(--accent);font-weight:600;font-size:22px}#calcOut.ok span{font-size:15px;margin-left:6px}
+#calcOut.err{font:13px var(--ui);color:var(--danger);white-space:normal}
+#calcOut sup,#calcOut sub{font-size:15px}
+.calkeys{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:4px 10px 8px}
+.ck{height:38px;border-radius:9px;background:var(--panel-2);font:15px var(--math);color:var(--fg)}
+.ck:hover{background:color-mix(in srgb,var(--accent) 10%,var(--panel-2))}
+.ck.num{background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);font-size:17px}
+.ck.op{color:var(--accent);font-size:19px}
+.ck.fn2{color:var(--danger);font-family:var(--ui)}
+.ck.eq{background:var(--accent);color:#fff;font-size:20px}
+.calfoot{display:flex;justify-content:flex-end;padding:0 10px 8px}
+.calfoot .btn{display:flex;align-items:center;gap:6px;font-size:13px}.calfoot svg.i{width:16px;height:16px}
+.calhist{border-top:1px solid var(--line);max-height:150px;overflow-y:auto;padding:4px 6px 6px}
+.ch{display:flex;justify-content:space-between;gap:10px;width:100%;padding:6px 8px;border-radius:7px;font:14px var(--math);text-align:left}
+.ch:hover{background:var(--panel-2)}.ch span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.ch b{font-weight:600;white-space:nowrap}
+.chempty{margin:8px;font-size:12px;color:var(--muted);text-align:center}
+@media (max-width:640px){#calc{right:12px;left:12px;width:auto}}
 /* code panel */
 #cpanel{right:max(12px,env(safe-area-inset-right,0px));z-index:22;width:min(400px,calc(100vw - 90px))}
 .cpb{display:flex;flex-direction:column;gap:6px}
@@ -430,6 +480,8 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
  <symbol id="i-full" viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></symbol>
  <symbol id="i-magnet" viewBox="0 0 24 24"><path d="M6 4h4v8a2 2 0 004 0V4h4v8a6 6 0 01-12 0z"/><path d="M6 8h4M14 8h4"/></symbol>
  <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></symbol>
+ <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></symbol>
+ <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2.5"/><rect x="8" y="6" width="8" height="3.5" rx="1"/><path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 16.5h.01M12 16.5h.01M15.5 16.5h.01" stroke-width="2.4"/></symbol>
  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
 </svg>
 
@@ -453,6 +505,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
   <button class="ib" data-tool="laser" title="Лазерная указка (K)"><svg class="i"><use href="#i-laser"/></svg><span class="k">K</span></button>
   <hr>
   <button class="ib" id="libBtn" title="Геометрия, графики, таблицы (G)"><svg class="i"><use href="#i-lib"/></svg><span class="k">G</span></button>
+  <button class="ib" id="calcBtn" title="Калькулятор (C)"><svg class="i"><use href="#i-calc"/></svg><span class="k">C</span></button>
   <button class="ib" id="fileBtn" title="Вставить PDF или картинку"><svg class="i"><use href="#i-file"/></svg></button>
 </nav>
 
@@ -520,12 +573,21 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{transition:non
   <div class="gwrap">
     <header class="ghead"><div class="glogo"><svg viewBox="0 0 256 256" aria-hidden="true"><rect x="8" y="8" width="240" height="240" rx="56" fill="#fff"/><g stroke="#d9e1f5" stroke-width="3"><line x1="48" y1="20" x2="48" y2="236"/><line x1="20" y1="48" x2="236" y2="48"/><line x1="88" y1="20" x2="88" y2="236"/><line x1="20" y1="88" x2="236" y2="88"/><line x1="128" y1="20" x2="128" y2="236"/><line x1="20" y1="128" x2="236" y2="128"/><line x1="168" y1="20" x2="168" y2="236"/><line x1="20" y1="168" x2="236" y2="168"/><line x1="208" y1="20" x2="208" y2="236"/><line x1="20" y1="208" x2="236" y2="208"/></g><rect x="8" y="8" width="240" height="240" rx="56" fill="none" stroke="#dfe4ee" stroke-width="4"/><path d="M174 50c-12-12-38-10-46 14c-6 20-8 60-12 100c-4 36-14 46-32 46c-12 0-20-6-22-12" fill="none" stroke="#2b59e0" stroke-width="22" stroke-linecap="round"/></svg></div><div class="gbrand"><b>Лемма</b><span id="gver"></span></div>
       <input id="gsearch" type="search" placeholder="Поиск: название, ученик, тема урока" autocomplete="off" aria-label="Поиск по доскам">
+      <button class="ib" id="gSetBtn" title="Настройки"><svg class="i"><use href="#i-gear"/></svg></button>
       <button class="ib" id="gcloseBtn" title="Вернуться к доске (Esc)"><svg class="i"><use href="#i-x"/></svg></button></header>
-    <div class="gbody"><nav id="gside" aria-label="Ученики"></nav>
+    <div class="gbody"><div class="gleft"><nav id="gside" aria-label="Ученики"></nav><div id="gupd"></div></div>
       <div><div class="gtitle"><h1 id="gtitle">Все доски</h1><span id="gcount"></span></div><div class="ggrid" id="ggrid"></div></div></div>
   </div>
 </section>
 <div id="dlg" hidden><form id="dlgBox" class="float dlgbox" novalidate></form></div>
+<section id="calc" class="float" hidden aria-label="Калькулятор">
+  <div class="calhead" id="calcDrag"><b>Калькулятор</b><button type="button" class="calmode" id="calcDeg" title="Переключить градусы и радианы">Градусы</button><button type="button" class="ib" id="calcClose" title="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div class="caldisp"><input id="calcIn" type="text" autocomplete="off" spellcheck="false" placeholder="2sin(30) + √16" aria-label="Пример"><div id="calcOut">&nbsp;</div></div>
+  <div class="calkeys" id="calcKeys"></div>
+  <div class="calfoot"><button type="button" class="btn" id="calcBoard"><svg class="i"><use href="#i-text"/></svg>На доску</button></div>
+  <div class="calhist" id="calcHist"></div>
+</section>
+<input type="file" id="backupIn" accept=".lemma,application/json" hidden>
 <input type="file" id="fileIn" accept="application/pdf,image/*" hidden>
 <input type="file" id="boardIn" accept=".doska,application/json" hidden>
 <textarea id="ted" hidden spellcheck="false"></textarea>
@@ -703,12 +765,12 @@ const FN_ENV={sin:Math.sin,cos:Math.cos,tg:Math.tan,tan:Math.tan,ctg:x=>1/Math.t
 const fnCache=new Map();
 function compileFn(src){
   if(fnCache.has(src))return fnCache.get(src);
-  let s=src.toLowerCase().replace(/^\s*y\s*=\s*/,'').replace(/−/g,'-').replace(/·|×/g,'*').replace(/:/g,'/').replace(/,/g,'.').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/²/g,'^2').replace(/³/g,'^3');
+  let s=src.toLowerCase().replace(/^\s*y\s*=\s*/,'').replace(/−/g,'-').replace(/·|×/g,'*').replace(/÷/g,'/').replace(/:/g,'/').replace(/,/g,'.').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/²/g,'^2').replace(/³/g,'^3');
   if(!/^[0-9a-z+\-*/^().\s|]*$/.test(s))throw new Error('Недопустимые символы');
   s=s.replace(/\|([^|]+)\|/g,'abs($1)');
   const ids=s.match(/[a-z][a-z0-9]*/g)||[];for(const id of ids)if(id!=='x'&&!(id in FN_ENV))throw new Error('Неизвестно: '+id);
   s=s.replace(/(?<![a-z0-9.])(\d+(?:\.\d+)?)\s*(x|[a-z]{2,}|\()/g,'$1*$2').replace(/\)\s*(\(|x|\d|[a-z])/g,')*$1').replace(/\bx\s*(\(|[a-z]{2,})/g,'x*$1').replace(/\^/g,'**');
-  let f;try{f=new Function('E','x','with(E){return ('+s+');}');}catch(e){throw new Error('Формула не дописана: проверьте скобки и знаки');}const g=x=>f(FN_ENV,x);try{g(0.5);}catch(e){throw new Error('Не получается посчитать эту формулу');}fnCache.set(src,g);return g;}
+  let f;try{f=new Function('E','x','with(E){return ('+s+');}');}catch(e){throw new Error('Формула не дописана: проверьте скобки и знаки');}const g=x=>f(FN_ENV,x);g.raw=(E,x)=>f(E,x);try{g(0.5);}catch(e){throw new Error('Не получается посчитать эту формулу');}fnCache.set(src,g);return g;}
 
 function graphItems(p){let f=p&&p.fns;if(typeof f==='string')f=f.split(';').map(s=>s.trim()).filter(Boolean).map((e,i)=>({e,c:i}));return Array.isArray(f)?f:[];}
 const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','n':'ⁿ','x':'ˣ'};
@@ -1265,6 +1327,7 @@ window.addEventListener('keydown',e=>{
   if(e.code==='Delete'||e.code==='Backspace'){deleteSel();return;}
   if(e.code==='Escape'){if(returnTool){const back=returnTool;setSel([]);setTool(back);return;}if(tool!=='select'){setTool('select');return;}setSel([]);closePanels();closeMenu();hideGraphPanel();hideCodePanel();hideNumPanel();return;}
   if(e.code==='KeyG'){toggleLib();return;}
+  if(e.code==='KeyC'){openCalc();return;}
   if(KEYS[e.code])setTool(KEYS[e.code]);
   const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
   if(arrows[e.code]&&selection.size){e.preventDefault();const s=e.shiftKey?20:2;const [dx,dy]=arrows[e.code];const m=new Map();for(const o of selObjs())m.set(o.id,transformObj(o,(x,y)=>[x+dx*s,y+dy*s],1,1));replaceObjs(m);commit();}
@@ -1429,7 +1492,7 @@ $('#gclose').onclick=()=>{hideGraphPanel();};
 $('#fileBtn').onclick=()=>$('#fileIn').click();
 $('#boardIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)importBoardFile(f);};
 $('#fileIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)handleFile(f);};
-function handleFile(f,at){if(/\.doska$/i.test(f.name)){importBoardFile(f);return;}if(f.type==='application/pdf'||/\.pdf$/i.test(f.name))openPdf(f);else if(f.type.startsWith('image/'))insertImageFile(f,at);else toast('Поддерживаются PDF и картинки');}
+function handleFile(f,at){if(/\.lemma$/i.test(f.name)){restoreBackup(f);return;}if(/\.doska$/i.test(f.name)){importBoardFile(f);return;}if(f.type==='application/pdf'||/\.pdf$/i.test(f.name))openPdf(f);else if(f.type.startsWith('image/'))insertImageFile(f,at);else toast('Поддерживаются PDF и картинки');}
 function insertImageFile(f,at){const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{let w=im.naturalWidth,h=im.naturalHeight;const max=2200;let src=r.result;
   if(Math.max(w,h)>max||f.size>1.5e6){const k=Math.min(1,max/Math.max(w,h));const c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);const x=c.getContext('2d');x.fillStyle='#fff';if(f.type!=='image/png')x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);src=f.type==='image/png'&&f.size<4e6?c.toDataURL('image/png'):c.toDataURL('image/jpeg',.88);w=c.width;h=c.height;}
   const disp=Math.min(1,700/Math.max(w,h))*(1/view.z<1?1:1);const ww=w*disp,hh=h*disp;const [cx,cy]=at||toWorld(W/2,H/2);
@@ -1597,7 +1660,7 @@ function updatePill(){$('#boardName').textContent=board.name||'Доска';docum
   const f=folders.find(x=>x.id===board.folder);$('#boardSub').textContent=(f?f.name+' · ':'')+(board.date?shortLesson(board.date):'');}
 async function createBoard(props={}){if(board.id)await saveNow({thumb:true});
   const date=props.date||todayISO();
-  const rec={id:uid(),name:props.name||('Урок '+shortLesson(date)),date,tags:props.tags||[],folder:props.folder||null,bg:board.bg||'grid',bgColor:board.bgColor||'#ffffff',objects:[],view:null,updated:Date.now()};
+  const rec={id:uid(),name:props.name||('Урок '+shortLesson(date)),date,tags:props.tags||[],folder:props.folder||null,bg:S.newBg||board.bg||'grid',bgColor:S.newBgColor||board.bgColor||'#ffffff',objects:[],view:null,updated:Date.now()};
   applyBoard(rec);view.z=1;view.x=-W/2;view.y=-H/2;await saveNow({thumb:true});}
 async function deleteBoardById(id){await tx('readwrite',s=>s.delete(id));await tx('readwrite',s=>s.delete(id),'meta');boardsMeta=boardsMeta.filter(b=>b.id!==id);
   if(id===board.id){board.id=null;objects=[];hist={stack:[[]],idx:0};selection=new Set();dirtyAll();}}
@@ -1649,7 +1712,7 @@ function renderGallery(){const q=$('#gsearch').value.trim();const searching=!!q;
    +(searching&&!list.length?`<p class="empty">Ничего не нашлось по запросу «${esc(q)}». Поиск идёт по названию, ученику, дате и темам урока.</p>`:'')
    +(!searching&&!list.length&&cur?`<p class="empty">У ${esc(cur.name)} пока нет досок. Нажмите «Новая доска».</p>`:'');
   $('#gcloseBtn').hidden=!board.id;
-  $('#gver').textContent=window.DOSKA_VERSION?'версия '+window.DOSKA_VERSION:'';}
+  $('#gver').textContent=window.DOSKA_VERSION?'версия '+window.DOSKA_VERSION:'';renderUpdChip();}
 $('#gsearch').addEventListener('input',renderGallery);
 $('#gsearch').addEventListener('keydown',e=>{if(e.key==='Escape'&&e.target.value){e.stopPropagation();e.target.value='';renderGallery();}});
 $('#gcloseBtn').onclick=closeGallery;
@@ -1684,7 +1747,7 @@ document.addEventListener('pointerdown',e=>{if(!e.target.closest('.gmenu,[data-g
 
 /* ---------- dialogs: board properties, new student ---------- */
 let dlgState=null;
-function closeDlg(){hideAnim($('#dlg'),160);dlgState=null;}
+function closeDlg(){hideAnim($('#dlg'),160,()=>$('#dlgBox').classList.remove('wide'));dlgState=null;}
 function openFolderDlg(){dlgState={kind:'folder'};$('#dlgBox').innerHTML=`<h2>Новый ученик</h2>
   <label class="fld">Имя ученика<input type="text" id="dFolder" maxlength="60" placeholder="Например, Маша Иванова" autocomplete="off"></label>
   <div class="dlgbtns"><button type="button" class="btn" data-x>Отмена</button><button type="submit" class="btn pri">Добавить</button></div>`;
@@ -1716,6 +1779,7 @@ $('#dlg').addEventListener('click',e=>{if(e.target.id==='dlg'||e.target.closest(
   if(e.target.id==='dTags')$('#dTagIn').focus();});
 $('#dlgBox').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape')closeDlg();});
 $('#dlgBox').addEventListener('submit',async e=>{e.preventDefault();const st=dlgState;if(!st)return;
+  if(st.kind==='settings')return;
   if(st.kind==='tpl'){const n=$('#dTpl').value;closeDlg();await saveTemplate(n);return;}
   if(st.kind==='pdf'){const what=document.querySelector('input[name=pWhat]:checked'),mode=document.querySelector('input[name=pMode]:checked').value,grid=$('#pGrid').checked;closeDlg();toast('Готовлю PDF…');try{const n=await exportPDF({sel:what&&what.value==='sel',mode,pattern:grid});if(n)toast(n===1?'PDF готов: 1 страница':'PDF готов: '+n+' '+plural(n,['страница','страницы','страниц']));}catch(err){toast('Не получилось сделать PDF');}return;}
   if(st.kind==='folder'){const n=$('#dFolder').value.trim();if(!n){$('#dFolder').focus();return;}const f=await createFolder(n);closeDlg();galFolder=f.id;renderGallery();return;}
@@ -1933,7 +1997,7 @@ async function checkUpdates(manual){const api=updApi();if(!api){if(manual)toast(
   if(!r||!r.ok){if(manual)toast('Не удалось проверить: нет связи с интернетом');return;}
   if(r.dev){if(manual)toast('Это запуск из исходников, автообновление выключено');return;}
   if(!r.available){if(manual)toast('У вас последняя версия — '+r.current);return;}
-  updInfo=r;showUpdate();}
+  updInfo=r;showUpdate();renderUpdChip();}
 function showUpdate(){const r=updInfo;$('#updTitle').textContent='Вышла Лемма '+r.latest;$('#updSub').textContent='У вас '+r.current+(r.size?' · загрузка '+fmtMB(r.size):'')+' · доски сохранятся';
   const notes=cleanNotes(r.notes);$('#updNotes').hidden=!notes;$('#updNotesText').textContent=notes;$('#updBar').hidden=true;$('#updGo').hidden=false;$('#updLater').hidden=false;$('#updGo').textContent='Обновить';showEl($('#upd'));}
 $('#updLater').onclick=()=>hideAnim($('#upd'),200);
@@ -1952,6 +2016,114 @@ function scheduleUpdateCheck(){if(!window.DOSKA_APP)return;const go=()=>setTimeo
 
 for(const id of ['nMin','nMax','nStep','nDots','nHoles']){$('#'+id).addEventListener('input',updateNum);$('#'+id).addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Escape'||e.key==='Enter')e.target.blur();});}
 $('#nclose').onclick=()=>hideNumPanel();$('#npanel').addEventListener('pointerdown',e=>e.stopPropagation());
+
+/* ============ settings (start screen) ============ */
+let lastUpd=null;
+async function checkUpdatesStatus(){const api=updApi();if(!api)return {state:'web'};if(updBusy)return {state:'busy'};
+  let r;try{r=await api.check_update();}catch(e){r={ok:false};}lastUpd=r;
+  if(!r||!r.ok)return {state:'offline'};if(r.dev)return {state:'dev'};if(r.available){updInfo=r;return {state:'avail',r};}return {state:'latest',r};}
+function setRow(on){return on?' on':'';}
+function openSettings(){dlgState={kind:'settings'};const v=window.DOSKA_VERSION||'';
+  $('#dlgBox').classList.add('wide');
+  $('#dlgBox').innerHTML=`<div class="sthead"><h2>Настройки</h2><button type="button" class="ib" data-x title="Закрыть"><svg class="i"><use href="#i-x"/></svg></button></div>
+   <section class="stsec"><h3>Обновления</h3>
+     <div class="strow"><div class="stl"><b>Лемма ${esc(v||'для браузера')}</b><span id="stUpdText">${window.DOSKA_APP?'Лемма сама проверяет обновления при запуске':'Обновления ставятся в приложении для Windows'}</span></div>
+       ${window.DOSKA_APP?`<button type="button" class="btn" id="stUpdBtn">Проверить</button>`:''}</div></section>
+   <section class="stsec"><h3>Рисование</h3>
+     <button type="button" class="toggle${setRow(S.recognize!==false)}" data-st="recog"><span class="stl"><b>Распознавать фигуры</b><span>Задержите перо в конце штриха — круг, многоугольник или линия выровняются</span></span><span class="tr"></span></button>
+     <button type="button" class="toggle${setRow(S.snapGrid)}" data-st="snap"><span class="stl"><b>Привязка к сетке</b><span>Фигуры, прямые с Shift и вершины встают по клеткам</span></span><span class="tr"></span></button>
+     <button type="button" class="toggle${setRow(penMode)}" data-st="pen"><span class="stl"><b>Только перо</b><span>Пальцем двигаете доску, рисует только стилус</span></span><span class="tr"></span></button></section>
+   <section class="stsec"><h3>Вид</h3>
+     <button type="button" class="toggle${setRow(!reduceMotion.matches)}" data-st="motion"><span class="stl"><b>Анимации</b><span>Плавное появление меню, досок и объектов</span></span><span class="tr"></span></button>
+     <div class="strow col"><div class="stl"><b>Фон новых досок</b><span>У уже созданных досок фон меняется в меню масштаба</span></div>
+       <div class="seg">${[['grid','Клетка'],['dots','Точки'],['none','Чистый']].map(([k,n])=>`<button type="button" data-nbg="${k}" class="${(S.newBg||'grid')===k?'on':''}">${n}</button>`).join('')}</div>
+       <div class="bgrow">${BG_PRESETS.map(([c,n])=>`<button type="button" class="sw${(S.newBgColor||'#ffffff')===c?' on':''}" data-nbgc="${c}" title="${n}"><i style="background:${c}"></i></button>`).join('')}</div></div></section>
+   <section class="stsec"><h3>Данные</h3>
+     <div class="strow"><div class="stl"><b>Резервная копия</b><span>Все доски, ученики и заготовки одним файлом. Пригодится для переноса на другой компьютер.</span></div>
+       <div class="stbtns">${window.DOSKA_APP?`<button type="button" class="btn" id="stBackup">Сохранить</button>`:''}<button type="button" class="btn" id="stRestore">Восстановить</button></div></div></section>
+   <p class="stfoot">Лемма — доска для уроков математики, физики и информатики. Доски хранятся на этом компьютере.</p>`;
+  showEl($('#dlg'));if(window.DOSKA_APP)$('#stUpdBtn').onclick=runSettingsUpdate;
+  $('#stRestore').onclick=()=>$('#backupIn').click();if($('#stBackup'))$('#stBackup').onclick=saveBackup;}
+async function runSettingsUpdate(){const b=$('#stUpdBtn'),t=$('#stUpdText');if(b.dataset.go){closeDlg();showUpdate();$('#updGo').click();return;}
+  b.disabled=true;t.textContent='Проверяю…';const s=await checkUpdatesStatus();b.disabled=false;
+  if(s.state==='avail'){t.innerHTML=`<em class="stnew">Вышла версия ${esc(s.r.latest)}</em>`;b.textContent='Обновить';b.classList.add('pri');b.dataset.go='1';renderUpdChip();}
+  else t.textContent={latest:'У вас последняя версия',offline:'Нет связи с интернетом, попробуйте позже',dev:'Запуск из исходников — автообновление выключено',busy:'Обновление уже скачивается'}[s.state]||'';}
+$('#dlgBox').addEventListener('click',e=>{if(!dlgState||dlgState.kind!=='settings')return;const b=e.target.closest('[data-st],[data-nbg],[data-nbgc]');if(!b)return;
+  const k=b.dataset.st;
+  if(k==='recog'){S.recognize=S.recognize===false;ls.set('settings',S);b.classList.toggle('on',S.recognize!==false);}
+  else if(k==='snap'){setSnap(!S.snapGrid,true);b.classList.toggle('on',S.snapGrid);}
+  else if(k==='pen'){penMode=!penMode;ls.set('penMode',penMode);updatePenModeUI();b.classList.toggle('on',penMode);}
+  else if(k==='motion'){const on=reduceMotion.matches;setMotion(on);ls.set('motion',on);b.classList.toggle('on',on);}
+  else if(b.dataset.nbg){S.newBg=b.dataset.nbg;ls.set('settings',S);b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));}
+  else if(b.dataset.nbgc){S.newBgColor=b.dataset.nbgc;ls.set('settings',S);b.parentNode.querySelectorAll('.sw').forEach(x=>x.classList.toggle('on',x===b));}});
+async function saveBackup(){if(board.id)await saveNow({thumb:true});const boards=(await tx('readonly',s=>s.getAll()))||[];
+  const data={lemmaBackup:1,created:new Date().toISOString(),boards,meta:boardsMeta.map(m=>Object.assign({},m)),folders,templates};
+  saveBlob(new Blob([JSON.stringify(data)],{type:'application/json'}),'Лемма — копия '+todayISO()+'.lemma');}
+async function restoreBackup(f){let d;try{d=JSON.parse(await f.text());}catch(e){toast('Это не файл резервной копии');return;}
+  if(!d||!d.lemmaBackup||!Array.isArray(d.boards)){toast('Это не файл резервной копии');return;}
+  const have=new Set(boardsMeta.map(m=>m.id));let added=0;
+  for(const fo of d.folders||[])if(!folders.some(x=>x.id===fo.id)){folders.push(fo);await tx('readwrite',s=>s.put(fo),'folders');}
+  for(const t of d.templates||[])if(!templates.some(x=>x.id===t.id)){templates.push(t);await tx('readwrite',s=>s.put(t),'templates');}
+  for(const r of d.boards){if(have.has(r.id))continue;await tx('readwrite',s=>s.put(r));const m=(d.meta||[]).find(x=>x.id===r.id)||{id:r.id,name:r.name,updated:r.updated,date:r.date,tags:r.tags||[],folder:r.folder||null};
+    await tx('readwrite',s=>s.put(Object.assign({},m)),'meta');boardsMeta.push(Object.assign({},m));added++;}
+  closeDlg();renderGallery();toast(added?`Восстановлено досок: ${added}`:'Все доски из копии уже есть');}
+/* update chip in the gallery sidebar */
+function renderUpdChip(){const el=$('#gupd');if(!el)return;const v=window.DOSKA_VERSION||'';
+  if(updInfo&&updInfo.available)el.innerHTML=`<button class="gupd new" id="gUpdGo"><svg class="i"><use href="#i-download"/></svg><span><b>Вышла Лемма ${esc(updInfo.latest)}</b><small>Нажмите, чтобы обновить</small></span></button>`;
+  else el.innerHTML=`<button class="gupd" id="gSettings"><svg class="i"><use href="#i-gear"/></svg><span><b>Настройки</b><small>${v?'Лемма '+esc(v):'Лемма'}</small></span></button>`;}
+document.addEventListener('click',e=>{if(e.target.closest('#gUpdGo')){showUpdate();$('#updGo').click();}if(e.target.closest('#gSettings,#gSetBtn'))openSettings();});
+
+/* ============ calculator ============ */
+const FN_DEG=Object.assign({},FN_ENV,{sin:x=>Math.sin(x*Math.PI/180),cos:x=>Math.cos(x*Math.PI/180),tg:x=>Math.tan(x*Math.PI/180),tan:x=>Math.tan(x*Math.PI/180),ctg:x=>1/Math.tan(x*Math.PI/180),cot:x=>1/Math.tan(x*Math.PI/180),
+  arcsin:x=>Math.asin(x)*180/Math.PI,arccos:x=>Math.acos(x)*180/Math.PI,arctg:x=>Math.atan(x)*180/Math.PI,asin:x=>Math.asin(x)*180/Math.PI,acos:x=>Math.acos(x)*180/Math.PI,atan:x=>Math.atan(x)*180/Math.PI});
+const calc={deg:ls.get('calcDeg',true),hist:ls.get('calcHist',[])};
+function calcEval(src){let s=String(src).trim();if(!s)return null;s=s.replace(/=\s*$/,'').replace(/÷/g,'/').replace(/(\d+(?:[.,]\d+)?)\s*%/g,'($1/100)')
+    .replace(/√\s*\(/g,'sqrt(').replace(/√\s*(\d+(?:[.,]\d+)?|π)/g,'sqrt($1)').replace(/\b(sin|cos|tg|ctg|tan|ln|lg|sqrt|abs|arcsin|arccos|arctg)\s+(-?\d+(?:[.,]\d+)?)/gi,'$1($2)');
+  if(/x/i.test(s.replace(/exp|max|min/gi,'')))throw new Error('Без переменной x, только числа');
+  const g=compileFn(s);const v=g.raw(calc.deg?FN_DEG:FN_ENV,0);if(typeof v!=='number'||!isFinite(v))throw new Error(isNaN(v)?'Нет значения (например, корень из отрицательного)':'Деление на ноль');return v;}
+function toFrac(v){if(!isFinite(v)||Math.abs(v)>1e9)return null;const sg=v<0?-1:1;v=Math.abs(v);let h1=1,h0=0,k1=0,k0=1,b=v;
+  for(let i=0;i<30;i++){const a=Math.floor(b);[h1,h0]=[a*h1+h0,h1];[k1,k0]=[a*k1+k0,k1];if(k1>10000)return null;if(Math.abs(v-h1/k1)<1e-10*Math.max(1,v))return k1===1?null:[sg*h1,k1];b=1/(b-a);if(!isFinite(b))break;}return null;}
+function fmtCalc(v){if(Math.abs(v)<1e-12)v=0;let t=Math.abs(v)>=1e12||(Math.abs(v)<1e-6&&v!==0)?v.toExponential(6).replace(/\.?0+e/,'e'):String(+v.toPrecision(12));return t.replace('.',',').replace('-','−');}
+function calcPretty(s,deg){let t=String(s).replace(/\s+/g,'');
+  if(deg)t=t.replace(/(sin|cos|tg|ctg|tan)\((-?\d+(?:[.,]\d+)?)\)/g,'$1 $2°');
+  t=t.replace(/sqrt\(([^()]*)\)/g,(m,a)=>/^[\d.,]+$|^π$/.test(a)?'√'+a:'√('+a+')').replace(/sqrt/g,'√').replace(/\bpi\b/g,'π').replace(/\*/g,'·')
+   .replace(/(\d|\))(sin|cos|tg|ctg|ln|√)/g,'$1·$2').replace(/([^(^e])([+\-])/g,'$1 $2 ').replace(/-/g,'−').replace(/\^2(?!\d)/g,'²').replace(/\^3(?!\d)/g,'³');
+  return t.replace(/\s+/g,' ').trim();}
+function calcResult(){const inp=$('#calcIn').value;const out=$('#calcOut');try{const v=calcEval(inp);if(v===null){out.innerHTML='&nbsp;';out.className='';return null;}
+  const fr=toFrac(v);out.className='ok';out.innerHTML=fr?`= <b>${fr[0]<0?'−':''}<sup>${Math.abs(fr[0])}</sup>⁄<sub>${fr[1]}</sub></b> <span>≈ ${fmtCalc(v)}</span>`:`= <b>${fmtCalc(v)}</b>`;return {v,fr};}
+  catch(e){out.className='err';out.textContent=inp.trim()?(e.message||'Не понимаю запись'):'';return null;}}
+function calcCommit(){const inp=$('#calcIn').value.trim();const r=calcResult();if(!r)return;const ans=r.fr?`${r.fr[0]}/${r.fr[1]}`:fmtCalc(r.v);
+  calc.hist=[{e:inp,a:ans,d:calc.deg},...calc.hist.filter(h=>h.e!==inp)].slice(0,30);ls.set('calcHist',calc.hist);renderCalcHist();
+  $('#calcIn').value=String(r.fr?`${r.fr[0]}/${r.fr[1]}`:+r.v.toPrecision(12)).replace('.',',');calcResult();}
+function renderCalcHist(){$('#calcHist').innerHTML=calc.hist.length?calc.hist.map((h,i)=>`<button type="button" class="ch" data-h="${i}" title="Подставить"><span>${esc(calcPretty(h.e,h.d))}</span><b>= ${esc(h.a.replace('.',',').replace('-','−'))}</b></button>`).join(''):'<p class="chempty">Здесь появятся ваши вычисления</p>';}
+function openCalc(){const c=$('#calc');if(!c.hidden){hideAnim(c,160);$('#calcBtn').classList.remove('on');return;}
+  const pos=ls.get('calcPos',null);if(pos){c.style.left=clamp(pos[0],8,window.innerWidth-340)+'px';c.style.top=clamp(pos[1],8,window.innerHeight-200)+'px';c.style.right='auto';}
+  showEl(c);$('#calcBtn').classList.add('on');$('#calcDeg').textContent=calc.deg?'Градусы':'Радианы';renderCalcHist();setTimeout(()=>{$('#calcIn').focus();},0);}
+const CALC_KEYS=[['sin','sin('],['cos','cos('],['tg','tg('],['√','sqrt('],['x²','^2'],['xʸ','^'],['π','π'],['(','('],[')',')'],['ln','ln('],
+  ['7','7'],['8','8'],['9','9'],['÷','/'],['C','clear'],['4','4'],['5','5'],['6','6'],['×','*'],['⌫','back'],['1','1'],['2','2'],['3','3'],['−','-'],['|x|','abs('],['0','0'],[',',','],['%','%'],['+','+'],['=','eq']];
+function buildCalc(){$('#calcKeys').innerHTML=CALC_KEYS.map(([l,v])=>`<button type="button" class="ck${/^[0-9,]$/.test(l)?' num':''}${l==='='?' eq':''}${['÷','×','−','+'].includes(l)?' op':''}${['C','⌫'].includes(l)?' fn2':''}" data-v="${esc(v)}">${l}</button>`).join('');}
+function calcInsertText(v){const i=$('#calcIn');const a=i.selectionStart??i.value.length,z=i.selectionEnd??i.value.length;i.value=i.value.slice(0,a)+v+i.value.slice(z);const p=a+v.length;i.setSelectionRange(p,p);calcResult();}
+function calcToBoard(){const inp=$('#calcIn').value.trim();let h=calc.hist[0];let line;
+  const r=inp?calcResult():null;if(r&&!(h&&String(+r.v.toPrecision(12)).replace('.',',')===inp)){const ans=r.fr?`${r.fr[0]}/${r.fr[1]}`:fmtCalc(r.v);line=`${calcPretty(inp,calc.deg)} = ${ans.replace('-','−')}`;}
+  else if(h)line=`${calcPretty(h.e,h.d)} = ${h.a.replace('.',',').replace('-','−')}`;if(!line){toast('Сначала посчитайте пример');return;}
+  const [cx,cy]=toWorld(W/2,H/2);const o={id:uid(),type:'text',x:cx-line.length*7,y:cy-16,text:line,size:28,color:S.text.color||'ink',font:'serif'};objects=[...objects,o];commit();setTool('select');setSel([o.id]);popIn([o.id]);toast('Пример на доске');}
+
+buildCalc();
+$('#calcBtn').onclick=openCalc;$('#calcClose').onclick=openCalc;
+$('#calcDeg').onclick=()=>{calc.deg=!calc.deg;ls.set('calcDeg',calc.deg);$('#calcDeg').textContent=calc.deg?'Градусы':'Радианы';calcResult();};
+$('#calcIn').addEventListener('input',calcResult);
+$('#calcIn').addEventListener('keydown',e=>{e.stopPropagation();if(e.key==='Enter'||e.key==='='){e.preventDefault();calcCommit();}else if(e.key==='Escape'){if($('#calcIn').value){$('#calcIn').value='';calcResult();}else openCalc();}});
+$('#calcKeys').addEventListener('pointerdown',e=>{if(e.target.closest('.ck'))e.preventDefault();});
+$('#calcKeys').addEventListener('click',e=>{const b=e.target.closest('.ck');if(!b)return;const v=b.dataset.v;const i=$('#calcIn');
+  if(v==='eq')calcCommit();else if(v==='clear'){i.value='';calcResult();}else if(v==='back'){const a=i.selectionStart??i.value.length,z=i.selectionEnd??i.value.length;if(a!==z){i.value=i.value.slice(0,a)+i.value.slice(z);i.setSelectionRange(a,a);}else if(a>0){i.value=i.value.slice(0,a-1)+i.value.slice(a);i.setSelectionRange(a-1,a-1);}calcResult();}
+  else calcInsertText(v);i.focus();});
+$('#calcHist').addEventListener('click',e=>{const h=e.target.closest('[data-h]');if(!h)return;const it=calc.hist[+h.dataset.h];$('#calcIn').value=it.e;calcResult();$('#calcIn').focus();});
+$('#calcBoard').onclick=calcToBoard;
+$('#calc').addEventListener('pointerdown',e=>e.stopPropagation());
+{let dr=null;$('#calcDrag').addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;const r=$('#calc').getBoundingClientRect();dr={dx:e.clientX-r.left,dy:e.clientY-r.top};$('#calcDrag').setPointerCapture(e.pointerId);});
+  $('#calcDrag').addEventListener('pointermove',e=>{if(!dr)return;const c=$('#calc');const x=clamp(e.clientX-dr.dx,8,window.innerWidth-c.offsetWidth-8),y=clamp(e.clientY-dr.dy,8,window.innerHeight-60);c.style.left=x+'px';c.style.top=y+'px';c.style.right='auto';});
+  $('#calcDrag').addEventListener('pointerup',()=>{if(!dr)return;dr=null;const r=$('#calc').getBoundingClientRect();ls.set('calcPos',[r.left,r.top]);});}
+$('#backupIn').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)restoreBackup(f);};
 
 /* ============ example board ============ */
 function seedExample(){const o=[];const add=x=>{x.id=uid();o.push(x);return x;};
