@@ -1186,6 +1186,8 @@ function onDown(e){
     if(rotHandleAt(sx,sy)){const b=selBB();const cx=b.x+b.w/2,cy=b.y+b.h/2;const objs=selObjs();drag={type:'rotate',id:e.pointerId,cx,cy,a0:Math.atan2(wy-cy,wx-cx),orig:objs,base:objs.length===1&&hasAng(objs[0])||objs.length===1&&(objs[0].type!=='stroke')?(objs[0].ang||0):0,lp:[sx,sy]};$('#selbar').hidden=true;return;}
     if(selection.size){const b=selBB();if(b){const hs=[[b.x,b.y,'nw'],[b.x+b.w,b.y,'ne'],[b.x,b.y+b.h,'sw'],[b.x+b.w,b.y+b.h,'se']];
       for(const [hx,hy,c] of hs){const [px,py]=toScreen(hx,hy);if(Math.abs(px-sx)<11&&Math.abs(py-sy)<11){drag={type:'scale',id:e.pointerId,corner:c,b,orig:selObjs()};return;}}}}
+    if(selection.size&&!e.shiftKey&&!dbl){const b=selBB();const pad=4/view.z;if(b&&wx>=b.x-pad&&wx<=b.x+b.w+pad&&wy>=b.y-pad&&wy<=b.y+b.h+pad){
+      drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey,anchor:moveAnchor()};needBase=true;$('#selbar').hidden=true;return;}}
     const hitO=[...objects].reverse().find(o=>hitObj(o,wx,wy,tol));
     if(hitO){
       if(dbl&&hitO.type==='text'){editText(hitO);return;}
