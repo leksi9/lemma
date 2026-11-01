@@ -770,6 +770,10 @@ function absBars(s){if(!s.includes('|'))return s;let out='',depth=0;const stack=
     const prev=out.replace(/\s+$/,'').slice(-1);const canClose=stack.length&&prev&&/[0-9a-z.)]/.test(prev)&&stack[stack.length-1]!==out.length;
     if(canClose){stack.pop();out+=')';}else{out+='abs(';stack.push(out.length);}}
   if(stack.length)throw new Error('Модуль не закрыт: не хватает «|»');return out;}
+/* JS forbids -x**2: a unary minus becomes (-1)*, so −x² = −(x²) as in school maths */
+function unaryMinus(s){let out='';for(let i=0;i<s.length;i++){const ch=s[i];if(ch!=='-'){out+=ch;continue;}
+    const prev=out.replace(/\s+$/,'');const pc=prev.slice(-1);const afterPow=prev.endsWith('**');
+    if(!afterPow&&(prev===''||'(+-*/,'.includes(pc)))out+='(-1)*';else out+=ch;}return out;}
 function compileFn(src){
   if(fnCache.has(src))return fnCache.get(src);
   let s=src.toLowerCase().replace(/^\s*y\s*=\s*/,'').replace(/−/g,'-').replace(/·|×/g,'*').replace(/÷/g,'/').replace(/:/g,'/').replace(/,/g,'.').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/²/g,'^2').replace(/³/g,'^3');
@@ -777,7 +781,7 @@ function compileFn(src){
   {const bad=s.match(/[^0-9a-z+\-*/^().\s|]/);if(bad)throw new Error('Непонятный символ «'+bad[0]+'»');}
   s=absBars(s);
   const ids=s.match(/[a-z][a-z0-9]*/g)||[];for(const id of ids)if(id!=='x'&&!(id in FN_ENV))throw new Error('Неизвестно: '+id);
-  s=s.replace(/(?<![a-z0-9.])(\d+(?:\.\d+)?)\s*(x|[a-z]{2,}|\()/g,'$1*$2').replace(/\)\s*(\(|x|\d|[a-z])/g,')*$1').replace(/\bx\s*(\(|[a-z]{2,})/g,'x*$1').replace(/\^/g,'**');
+  s=s.replace(/(?<![a-z0-9.])(\d+(?:\.\d+)?)\s*(x|[a-z]{2,}|\()/g,'$1*$2').replace(/\)\s*(\(|x|\d|[a-z])/g,')*$1').replace(/\bx\s*(\(|[a-z]{2,})/g,'x*$1').replace(/\^/g,'**');s=unaryMinus(s);
   let f;try{f=new Function('E','x','with(E){return ('+s+');}');}catch(e){throw new Error('Формула не дописана: проверьте скобки и знаки');}const g=x=>f(FN_ENV,x);g.raw=(E,x)=>f(E,x);try{g(0.5);}catch(e){throw new Error('Не получается посчитать эту формулу');}fnCache.set(src,g);return g;}
 
 function graphItems(p){let f=p&&p.fns;if(typeof f==='string')f=f.split(';').map(s=>s.trim()).filter(Boolean).map((e,i)=>({e,c:i}));return Array.isArray(f)?f:[];}
