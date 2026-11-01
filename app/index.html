@@ -773,11 +773,18 @@ function axesPlane(ctx,w,h,o,opt={}){
 const GCOL=['#2f6fed','#e5484d','#2a9d5a','#e8871e','#8b5cf6'];
 const FN_ENV={sin:Math.sin,cos:Math.cos,tg:Math.tan,tan:Math.tan,ctg:x=>1/Math.tan(x),cot:x=>1/Math.tan(x),sqrt:Math.sqrt,abs:Math.abs,ln:Math.log,lg:Math.log10,log:Math.log10,log2:Math.log2,exp:Math.exp,pi:Math.PI,e:Math.E,arcsin:Math.asin,arccos:Math.acos,arctg:Math.atan,asin:Math.asin,acos:Math.acos,atan:Math.atan,sgn:Math.sign,floor:Math.floor};
 const fnCache=new Map();
+/* |…| → abs(…), including nested bars like ||x|-1| */
+function absBars(s){if(!s.includes('|'))return s;let out='',depth=0;const stack=[];
+  for(let i=0;i<s.length;i++){const ch=s[i];if(ch!=='|'){out+=ch;continue;}
+    const prev=out.replace(/\s+$/,'').slice(-1);const canClose=stack.length&&prev&&/[0-9a-z.)]/.test(prev)&&stack[stack.length-1]!==out.length;
+    if(canClose){stack.pop();out+=')';}else{out+='abs(';stack.push(out.length);}}
+  if(stack.length)throw new Error('Модуль не закрыт: не хватает «|»');return out;}
 function compileFn(src){
   if(fnCache.has(src))return fnCache.get(src);
   let s=src.toLowerCase().replace(/^\s*y\s*=\s*/,'').replace(/−/g,'-').replace(/·|×/g,'*').replace(/÷/g,'/').replace(/:/g,'/').replace(/,/g,'.').replace(/π/g,'pi').replace(/√/g,'sqrt').replace(/²/g,'^2').replace(/³/g,'^3');
-  if(!/^[0-9a-z+\-*/^().\s|]*$/.test(s))throw new Error('Недопустимые символы');
-  s=s.replace(/\|([^|]+)\|/g,'abs($1)');
+  s=s.replace(/[¦│∣ǀ｜‖⎮]/g,'|');
+  {const bad=s.match(/[^0-9a-z+\-*/^().\s|]/);if(bad)throw new Error('Непонятный символ «'+bad[0]+'»');}
+  s=absBars(s);
   const ids=s.match(/[a-z][a-z0-9]*/g)||[];for(const id of ids)if(id!=='x'&&!(id in FN_ENV))throw new Error('Неизвестно: '+id);
   s=s.replace(/(?<![a-z0-9.])(\d+(?:\.\d+)?)\s*(x|[a-z]{2,}|\()/g,'$1*$2').replace(/\)\s*(\(|x|\d|[a-z])/g,')*$1').replace(/\bx\s*(\(|[a-z]{2,})/g,'x*$1').replace(/\^/g,'**');
   let f;try{f=new Function('E','x','with(E){return ('+s+');}');}catch(e){throw new Error('Формула не дописана: проверьте скобки и знаки');}const g=x=>f(FN_ENV,x);g.raw=(E,x)=>f(E,x);try{g(0.5);}catch(e){throw new Error('Не получается посчитать эту формулу');}fnCache.set(src,g);return g;}
@@ -787,6 +794,25 @@ const SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7
 function pretty(s){return String(s).replace(/\s+/g,' ').replace(/\^\(([-0-9nx]+)\)|\^([-]?[0-9nx]+)/g,(m,a,b)=>[...(a||b)].map(c=>SUP[c]||c).join('')).replace(/sqrt/g,'√').replace(/\bpi\b/g,'π').replace(/\*/g,'·').replace(/-/g,'−');}
 function fmtNum(v){const r=Math.round(v*1000)/1000;return String(r).replace('.',',').replace('-','−');}
 const itemCache=new Map();
+/* condition like  x<0,  -1<=x<2,  x≥3  → interval */
+function parseCond(c){c=c.replace(/≤/g,'<=').replace(/≥/g,'>=').replace(/−/g,'-').replace(/\s+/g,'');
+  const parts=c.split(/(<=|>=|<|>)/);if(parts.length<3||parts.length%2===0)throw new Error('Не понимаю условие «'+c+'»');
+  const iv={lo:-Infinity,hi:Infinity,loIn:false,hiIn:false};
+  const num=t=>{if(/x/i.test(t.replace(/exp/gi,'')))throw new Error('Условие пишется так: x<0 или -1<=x<2');const v=compileFn(t)(0);if(!isFinite(v))throw new Error('Не число в условии');return v;};
+  for(let i=0;i+2<parts.length;i+=2){const a=parts[i],op=parts[i+1],b=parts[i+2];let xLeft;
+    if(/^x$/i.test(a))xLeft=true;else if(/^x$/i.test(b))xLeft=false;else throw new Error('В условии нужен x: например x<0');
+    const v=num(xLeft?b:a);const inc=op.length===2;const less=op[0]==='<';
+    // x<v  or  v>x  → upper bound;  x>v or v<x → lower bound
+    if(less===xLeft){if(v<iv.hi||(v===iv.hi&&!inc)){iv.hi=v;iv.hiIn=inc;}}else{if(v>iv.lo||(v===iv.lo&&!inc)){iv.lo=v;iv.loIn=inc;}}}
+  return iv;}
+function splitTop(s,ch){const out=[];let d=0,cur='';for(const c of s){if(c==='('||c==='{'||c==='[')d++;else if(c===')'||c==='}'||c===']')d--;if(c===ch&&d===0){out.push(cur);cur='';}else cur+=c;}out.push(cur);return out;}
+function compilePiecewise(rhs){let t=rhs.trim().replace(/\s+(при|если|где)\s+/gi,', ');
+  if(/^\{[\s\S]*\}$/.test(t))t=t.slice(1,-1);
+  const pieces=splitTop(t,';').map(x=>x.trim()).filter(Boolean);
+  const out=pieces.map(pc=>{const cs=splitTop(pc,',');let k=-1;for(let i=cs.length-1;i>0;i--){if(/[<>≤≥]/.test(cs.slice(i).join(','))){k=i;}else break;}
+    if(k<0)throw new Error('Для каждого куска нужно условие: x^2, x<0');
+    const expr=cs.slice(0,k).join(','),cond=cs.slice(k).join(',');return Object.assign({f:compileFn(expr),e:expr},parseCond(cond));});
+  return out;}
 function compileItem(src){src=String(src||'').trim();if(itemCache.has(src))return itemCache.get(src);let r;
   try{let m;
     if(!src)r={type:'empty'};
@@ -795,16 +821,32 @@ function compileItem(src){src=String(src||'').trim();if(itemCache.has(src))retur
       const v=parts.map(t=>{if(/x/i.test(t.replace(/exp/gi,'')))throw new Error('В координатах точки не должно быть x');const f=compileFn(t);return f(0);});
       if(!v.every(isFinite))throw new Error('Не получается вычислить координаты');r={type:'point',x:v[0],y:v[1],name:m[1]||''};}
     else if((m=src.match(/^x\s*=\s*(.+)$/i))){if(/x/i.test(m[1].replace(/exp/gi,'')))throw new Error('Справа от «x =» должно быть число');const v=compileFn(m[1])(0);if(!isFinite(v))throw new Error('Не число');r={type:'vline',v,label:'x = '+pretty(m[1])};}
-    else{const rhs=src.replace(/^(y|f\s*\(\s*x\s*\))\s*=\s*/i,'');if(/[<>]/.test(rhs))throw new Error('Неравенства пока не поддерживаются');const f=compileFn(rhs);r={type:'fn',f,label:'y = '+pretty(rhs)};}
+    else{const rhs=src.replace(/^(y|f\s*\(\s*x\s*\))\s*=\s*/i,'');
+      if(/[<>≤≥]/.test(rhs)){const pcs=compilePiecewise(rhs);r={type:'pw',pieces:pcs,label:'y = '+(pcs.length>1?'{ '+pcs.map(q=>pretty(q.e)).join(' ; ')+' }':pretty(pcs[0].e))};}
+      else{const f=compileFn(rhs);r={type:'fn',f,label:'y = '+pretty(rhs)};}}
   }catch(e){r={type:'err',msg:e.message||'Не понимаю запись'};}
   if(itemCache.size>500)itemCache.clear();itemCache.set(src,r);return r;}
+function plotFn(ctx,f,a,b,X,Y,w,h){ctx.beginPath();let pen=false,py=0;const span=b-a;
+  const n=Math.max(60,Math.round(Math.abs(X(b)-X(a))*1.5));
+  for(let k=0;k<=n;k++){const x=a+span*k/n;let y;try{y=f(x)}catch(e){y=NaN}
+    if(!isFinite(y)){pen=false;continue;}const sy=Y(y);if(pen&&Math.abs(sy-py)>h*1.5){pen=false;}
+    if(!pen){ctx.moveTo(X(x),sy);pen=true}else ctx.lineTo(X(x),sy);py=sy;}ctx.stroke();}
 function drawGraph(ctx,w,h,o){const {X,Y,p}=axesPlane(ctx,w,h,o);const items=graphItems(p);const labs=[];
   ctx.save();ctx.beginPath();ctx.rect(0,0,w,h);ctx.clip();
   items.forEach((it,i)=>{if(it.h)return;const r=compileItem(it.e);const color=GCOL[(it.c??i)%GCOL.length];ctx.strokeStyle=ctx.fillStyle=color;ctx.lineWidth=2.4;ctx.setLineDash([]);
-    if(r.type==='fn'){const f=r.f;ctx.beginPath();let pen=false,py=0;
-      const N=Math.max(200,Math.round(w*1.5));for(let k=0;k<=N;k++){const x=p.xmin+(p.xmax-p.xmin)*k/N;let y;try{y=f(x)}catch(e){y=NaN}
-        if(!isFinite(y)){pen=false;continue;}const sy=Y(y);if(pen&&Math.abs(sy-py)>h*1.5){pen=false;}
-        if(!pen){ctx.moveTo(X(x),sy);pen=true}else ctx.lineTo(X(x),sy);py=sy;}ctx.stroke();labs.push([r.label,color]);}
+    if(r.type==='fn'){plotFn(ctx,r.f,p.xmin,p.xmax,X,Y,w,h);labs.push([r.label,color]);}
+    else if(r.type==='pw'){const ev=(f,x)=>{try{return f(x)}catch(e){return NaN}};const ends=[];
+      for(const q of r.pieces){const a=Math.max(p.xmin,q.lo),b=Math.min(p.xmax,q.hi);if(b>a)plotFn(ctx,q.f,a,b,X,Y,w,h);
+        if(isFinite(q.lo))ends.push({x:q.lo,y:ev(q.f,q.lo),inc:q.loIn});if(isFinite(q.hi))ends.push({x:q.hi,y:ev(q.f,q.hi),inc:q.hiIn});}
+      // endpoint dots: skip where neighbouring pieces meet continuously and the point is included
+      const tol=(p.ymax-p.ymin)*1e-3;
+      const drawn=[];for(const e of ends){if(!isFinite(e.y)||e.x<p.xmin||e.x>p.xmax)continue;const same=ends.filter(o=>Math.abs(o.x-e.x)<1e-9&&isFinite(o.y));
+        const cont=same.length>1&&same.every(o=>Math.abs(o.y-e.y)<tol)&&same.some(o=>o.inc);if(cont)continue;
+        if(drawn.some(d=>Math.abs(d.x-e.x)<1e-9&&Math.abs(d.y-e.y)<tol&&d.inc>=e.inc))continue;drawn.push(e);}
+      drawn.sort((a,b)=>a.inc-b.inc);
+      for(const e of drawn){if(drawn.some(d=>d!==e&&d.inc&&!e.inc&&Math.abs(d.x-e.x)<1e-9&&Math.abs(d.y-e.y)<tol))continue;ctx.beginPath();ctx.arc(X(e.x),Y(e.y),4.5,0,7);
+        if(e.inc)ctx.fill();else{ctx.save();ctx.fillStyle=T.paper||'#fff';ctx.fill();ctx.lineWidth=2;ctx.stroke();ctx.restore();}}
+      labs.push([r.label,color]);}
     else if(r.type==='vline'){const x=X(r.v);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();labs.push([r.label,color]);}
     else if(r.type==='point'){const px=X(r.x),py=Y(r.y);ctx.beginPath();ctx.arc(px,py,4.5,0,7);ctx.fill();ctx.font='italic 16px "STIX Two Text", serif';ctx.textAlign='left';ctx.textBaseline='bottom';ctx.fillText((r.name?r.name+' ':'')+'('+fmtNum(r.x)+'; '+fmtNum(r.y)+')',px+7,py-3);}
   });
@@ -1044,6 +1086,8 @@ function renderOver(){const ctx=octx;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clear
     if(drag&&drag.type==='vertex'){ctx.save();ctx.strokeStyle=T.accent;ctx.lineWidth=1;ctx.setLineDash([5,4]);for(const g of drag.guides||[]){const [ax,ay]=toScreen(g.p[0],g.p[1]),[bx,by]=toScreen(g.q[0],g.q[1]);const dx=bx-ax,dy=by-ay,L=Math.hypot(dx,dy)||1;ctx.beginPath();ctx.moveTo(ax-dx/L*40,ay-dy/L*40);ctx.lineTo(bx+dx/L*40,by+dy/L*40);ctx.stroke();
       if(g.par){const P=vertsOf(vo);const [cx1,cy1]=toScreen(P[g.par[0]][0],P[g.par[0]][1]),[cx2,cy2]=toScreen(P[g.par[1]][0],P[g.par[1]][1]);ctx.setLineDash([]);ctx.lineWidth=3;ctx.globalAlpha=.35;ctx.beginPath();ctx.moveTo(cx1,cy1);ctx.lineTo(cx2,cy2);ctx.stroke();ctx.globalAlpha=1;ctx.lineWidth=1;ctx.setLineDash([5,4]);}}ctx.restore();}
     ctx.save();ctx.lineWidth=1.5;for(let i=0;i<V.length;i++){const [px,py]=toScreen(V[i][0],V[i][1]);const on=drag&&drag.type==='vertex'&&drag.i===i;ctx.fillStyle=on?T.accent:T.panel;ctx.strokeStyle=T.accent;ctx.beginPath();ctx.arc(px,py,on?6:5,0,7);ctx.fill();ctx.stroke();}ctx.restore();}}
+  if(drag&&drag.type==='move'&&drag.guides&&drag.guides.length){ctx.save();ctx.strokeStyle='#f0398b';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+    for(const g of drag.guides){ctx.beginPath();if(g.v){const [x,y1]=toScreen(g.at,g.lo),[,y2]=toScreen(g.at,g.hi);ctx.moveTo(Math.round(x)+.5,y1-8);ctx.lineTo(Math.round(x)+.5,y2+8);}else{const [x1,y]=toScreen(g.lo,g.at),[x2]=toScreen(g.hi,g.at);ctx.moveTo(x1-8,Math.round(y)+.5);ctx.lineTo(x2+8,Math.round(y)+.5);}ctx.stroke();}ctx.restore();}
   if(drag&&drag.type==='rotate'&&drag.label){const [x,y]=drag.lp;const t=drag.label;ctx.font='500 12px "Golos Text", system-ui, sans-serif';const w=ctx.measureText(t).width+14;ctx.fillStyle=T.uiFg||'#1c212b';ctx.globalAlpha=.88;ctx.beginPath();ctx.roundRect?ctx.roundRect(x+16,y+14,w,22,6):ctx.rect(x+16,y+14,w,22);ctx.fill();ctx.globalAlpha=1;ctx.fillStyle=T.panel;ctx.textBaseline='middle';ctx.textAlign='left';ctx.fillText(t,x+23,y+25);}
   if(marquee){const [x1,y1]=toScreen(marquee.x1,marquee.y1),[x2,y2]=toScreen(marquee.x2,marquee.y2);ctx.fillStyle=T.accent;ctx.globalAlpha=.08;ctx.fillRect(x1,y1,x2-x1,y2-y1);ctx.globalAlpha=1;ctx.strokeStyle=T.accent;ctx.lineWidth=1;ctx.setLineDash([4,3]);ctx.strokeRect(x1+.5,y1+.5,x2-x1,y2-y1);ctx.setLineDash([]);}
   // laser
@@ -1067,6 +1111,23 @@ function snapTargets(skipId){const pts=[];const vr={x:view.x-50,y:view.y-50,w:W/
       else if(o.kind==='rect'&&!o.ang)pts.push([o.x1,o.y1],[o.x2,o.y1],[o.x2,o.y2],[o.x1,o.y2]);}}
   return pts;}
 function snapNear(x,y,list,skip){const r=12/view.z;let best=null,bd=r;for(const p of list){if(skip&&Math.hypot(p[0]-skip[0],p[1]-skip[1])<1e-6)continue;const d=Math.hypot(p[0]-x,p[1]-y);if(d<bd){bd=d;best=p;}}return best;}
+/* smart guides: edges and centres of the moved selection line up with other objects */
+function alignBox(o){if(o.type==='image'||o.type==='code'||(o.type==='fig'&&FIGS[o.kind]&&FIGS[o.kind].table)||(o.type==='fig'&&o.kind==='graph')){const b=hasAng(o)?bounds(o):rawBox(o);return b;}
+  if(o.type==='fig'&&!hasAng(o))return {x:o.x,y:o.y,w:o.w,h:o.h};return bounds(o);}
+function alignSetup(){const sel=selObjs();if(!sel.length)return null;const vr={x:view.x-W/view.z,y:view.y-H/view.z,w:3*W/view.z,h:3*H/view.z};
+  const boxes=objects.filter(o=>!selection.has(o.id)&&(o.type!=='stroke')).map(alignBox).filter(b=>b&&inter(b,vr));
+  let x1=Infinity,y1=Infinity,x2=-Infinity,y2=-Infinity;for(const o of sel){const b=alignBox(o);x1=Math.min(x1,b.x);y1=Math.min(y1,b.y);x2=Math.max(x2,b.x+b.w);y2=Math.max(y2,b.y+b.h);}
+  return {box:{x:x1,y:y1,w:x2-x1,h:y2-y1},boxes};}
+function alignSnap(A,dx,dy){const b=A.box,tol=7/view.z;const mx=[b.x+dx,b.x+b.w/2+dx,b.x+b.w+dx],my=[b.y+dy,b.y+b.h/2+dy,b.y+b.h+dy];
+  let bx=null,by=null;
+  for(const o of A.boxes){const ox=[o.x,o.x+o.w/2,o.x+o.w],oy=[o.y,o.y+o.h/2,o.y+o.h];
+    for(let i=0;i<3;i++)for(let j=0;j<3;j++){if((i===1)!==(j===1))continue;
+      const d=ox[j]-mx[i];if(Math.abs(d)<tol&&(!bx||Math.abs(d)<Math.abs(bx.d)-1e-6))bx={d,x:ox[j],o};
+      const e=oy[j]-my[i];if(Math.abs(e)<tol&&(!by||Math.abs(e)<Math.abs(by.d)-1e-6))by={d:e,y:oy[j],o};}}
+  const guides=[];if(bx){dx+=bx.d;const lo=Math.min(b.y+dy,bx.o.y),hi=Math.max(b.y+b.h+dy,bx.o.y+bx.o.h);guides.push({v:true,at:bx.x,lo,hi});}
+  if(by){dy+=by.d;const lo=Math.min(b.x+dx,by.o.x),hi=Math.max(b.x+b.w+dx,by.o.x+by.o.w);guides.push({v:false,at:by.y,lo,hi});}
+  if(bx&&by)for(const g of guides){if(g.v){g.lo=Math.min(g.lo,b.y+dy);g.hi=Math.max(g.hi,b.y+b.h+dy);}else{g.lo=Math.min(g.lo,b.x+dx);g.hi=Math.max(g.hi,b.x+b.w+dx);}}
+  return {dx,dy,guides,sx:!!bx,sy:!!by};}
 function moveAnchor(){const objs=selObjs();if(objs.length===1){const o=objs[0];if(o.type==='shape')return o.kind==='poly'?[o.pts[0],o.pts[1]]:[Math.min(o.x1,o.x2),Math.min(o.y1,o.y2)];if(o.type==='stroke')return o.st?[o.pts[0],o.pts[1]]:[o.bb.x,o.bb.y];return [o.x,o.y];}const b=selBB();return b?[b.x,b.y]:null;}
 function gridSnap(x,y){const g=gridStep();return [Math.round(x/g)*g,Math.round(y/g)*g];}
 /* editable vertices: polygons and lines */
@@ -1196,7 +1257,7 @@ function onDown(e){
     if(selection.size){const b=selBB();if(b){const hs=[[b.x,b.y,'nw'],[b.x+b.w,b.y,'ne'],[b.x,b.y+b.h,'sw'],[b.x+b.w,b.y+b.h,'se']];
       for(const [hx,hy,c] of hs){const [px,py]=toScreen(hx,hy);if(Math.abs(px-sx)<11&&Math.abs(py-sy)<11){drag={type:'scale',id:e.pointerId,corner:c,b,orig:selObjs()};return;}}}}
     if(selection.size&&!e.shiftKey&&!dbl){const b=selBB();const pad=4/view.z;if(b&&wx>=b.x-pad&&wx<=b.x+b.w+pad&&wy>=b.y-pad&&wy<=b.y+b.h+pad){
-      drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey,anchor:moveAnchor()};needBase=true;$('#selbar').hidden=true;return;}}
+      drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey,anchor:moveAnchor(),align:alignSetup()};needBase=true;$('#selbar').hidden=true;return;}}
     const hitO=[...objects].reverse().find(o=>hitObj(o,wx,wy,tol));
     if(hitO){
       if(dbl&&hitO.type==='text'){editText(hitO);return;}
@@ -1204,7 +1265,7 @@ function onDown(e){
       if(dbl&&hitO.type==='code'){setSel([hitO.id]);openCodePanel(hitO.id,true);return;}
       if(e.shiftKey){const s=new Set(selection);s.has(hitO.id)?s.delete(hitO.id):s.add(hitO.id);setSel(s);}
       else if(!selection.has(hitO.id))setSel([hitO.id]);
-      drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey,anchor:moveAnchor()};needBase=true;$('#selbar').hidden=true;return;}
+      drag={type:'move',id:e.pointerId,x:wx,y:wy,dx:0,dy:0,alt:e.altKey,anchor:moveAnchor(),align:alignSetup()};needBase=true;$('#selbar').hidden=true;return;}
     if(returnTool&&!e.shiftKey){const back=returnTool;setSel([]);setTool(back);onDown(e);return;}
     if(!e.shiftKey)setSel([]);
     marquee={x1:wx,y1:wy,x2:wx,y2:wy,add:e.shiftKey};drag={type:'marquee',id:e.pointerId};return;}
@@ -1250,7 +1311,8 @@ function onMove(e){
       s.x2=x;s.y2=y;needOver=true;break;}
     case 'laser':laser.push({x:wx,y:wy,t:performance.now()});needOver=true;break;
     case 'vertex':{const r=vertexSnap(drag.orig,drag.i,wx,wy,e.altKey,drag.targets);drag.cur=withVert(drag.orig,drag.i,r.x,r.y);drag.guides=r.guides;drag.preview=new Map([[drag.orig.id,drag.cur]]);needBase=true;needOver=true;break;}
-    case 'move':{drag.dx=wx-drag.x;drag.dy=wy-drag.y;if(S.snapGrid&&drag.anchor){const [gx,gy]=gridSnap(drag.anchor[0]+drag.dx,drag.anchor[1]+drag.dy);drag.dx=gx-drag.anchor[0];drag.dy=gy-drag.anchor[1];}needBase=true;needOver=true;break;}
+    case 'move':{drag.dx=wx-drag.x;drag.dy=wy-drag.y;const rdx=drag.dx,rdy=drag.dy;if(S.snapGrid&&drag.anchor){const [gx,gy]=gridSnap(drag.anchor[0]+drag.dx,drag.anchor[1]+drag.dy);drag.dx=gx-drag.anchor[0];drag.dy=gy-drag.anchor[1];}
+      drag.guides=null;if(drag.align&&!e.altKey&&S.align!==false){const r=alignSnap(drag.align,rdx,rdy);if(r.sx)drag.dx=r.dx;if(r.sy)drag.dy=r.dy;drag.guides=r.guides;}needBase=true;needOver=true;break;}
     case 'rotate':{let d=Math.atan2(wy-drag.cy,wx-drag.cx)-drag.a0;let fin=drag.base+d;const step=Math.PI/12;
       if(e.shiftKey)fin=Math.round(fin/step)*step;else{const q=Math.round(fin/(Math.PI/2))*(Math.PI/2);if(Math.abs(fin-q)<0.05)fin=q;}
       d=fin-drag.base;const m=new Map();for(const o of drag.orig)m.set(o.id,rotateObj(o,d,drag.cx,drag.cy));drag.preview=m;
@@ -1503,6 +1565,9 @@ function renderGraphPanel(){const o=gpObj();if(!o)return;const p=gParams(o);
    <div class="fhelp"><b>Что можно писать</b>
      <div><code>x^2 - 4x + 3</code> или <code>y = 2x + 1</code></div>
      <div><code>sqrt(x)</code>, <code>|x|</code>, <code>1/x</code>, <code>sin(x)</code>, <code>tg(x)</code>, <code>ln(x)</code>, <code>log2(x)</code>, <code>2^x</code>, <code>pi</code></div>
+     <div><code>|x − 2|</code> или <code>abs(x − 2)</code> — модуль</div>
+     <div><code>x^2, x&lt;0; 2x, x&gt;=0</code> — кусочная функция</div>
+     <div><code>sqrt(x), 0&lt;=x&lt;4</code> — только на отрезке</div>
      <div><code>x = 3</code> — вертикальная прямая</div>
      <div><code>(2; -1)</code> или <code>A(2; -1)</code> — точка</div>
      <div>Enter — новая строка. Кружок слева скрывает график.</div></div>`;}
@@ -1533,12 +1598,12 @@ function insertImageFile(f,at){const r=new FileReader();r.onload=()=>{const im=n
   const disp=Math.min(1,700/Math.max(w,h))*(1/view.z<1?1:1);const ww=w*disp,hh=h*disp;const [cx,cy]=at||toWorld(W/2,H/2);
   const o={id:uid(),type:'image',x:cx-ww/2,y:cy-hh/2,w:ww,h:hh,src};objects=[...objects,o];commit();setTool('select');setSel([o.id]);};im.src=r.result;};r.readAsDataURL(f);}
 
-let pdfDoc=null,pdfUsed=new Set();
+let pdfDoc=null,pdfUsed=new Set(),lastPdfId=null;
 function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('load '+src));document.head.appendChild(s);});}
 let pdfReady=null;
 function ensurePdf(){if(!pdfReady)pdfReady=(async()=>{const v='3.11.174';const A=window.DOSKA_ASSETS||{pdf:`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${v}/pdf.min.js`,worker:`https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${v}/pdf.worker.min.js`};await loadScript(A.pdf);await loadScript(A.worker);window.pdfjsLib.GlobalWorkerOptions.workerSrc=A.worker;return window.pdfjsLib;})();return pdfReady;}
 async function openPdf(f){showEl($('#pdf'));$('#pdfName').textContent=f.name;$('#pdfInfo').textContent='Открываю…';$('#pdfPages').innerHTML='';
-  try{const lib=await ensurePdf();const buf=await f.arrayBuffer();pdfDoc=await lib.getDocument({data:buf}).promise;pdfUsed=new Set();
+  try{const lib=await ensurePdf();const buf=await f.arrayBuffer();pdfDoc=await lib.getDocument({data:buf}).promise;pdfUsed=new Set();lastPdfId=null;
     $('#pdfInfo').textContent=pdfDoc.numPages+' стр. · нажмите на страницу, чтобы вставить';
     $('#pdfPages').innerHTML=Array.from({length:pdfDoc.numPages},(_,i)=>`<button class="pg" data-p="${i+1}" title="Вставить страницу ${i+1}"><canvas></canvas><span class="n">${i+1}</span></button>`).join('');
     const io=new IntersectionObserver(ents=>{for(const en of ents)if(en.isIntersecting){io.unobserve(en.target);renderThumb(en.target);}},{root:$('#pdf .pb'),rootMargin:'200px'});
@@ -1549,7 +1614,7 @@ function renderThumb(el){thumbQ.push(el);pumpThumbs();}
 async function pumpThumbs(){if(thumbBusy)return;thumbBusy=true;while(thumbQ.length){const el=thumbQ.shift();try{const pg=await pdfDoc.getPage(+el.dataset.p);const vp0=pg.getViewport({scale:1});const vp=pg.getViewport({scale:300/vp0.width});const c=el.querySelector('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;}catch(e){}}thumbBusy=false;}
 async function pageToImage(n){const pg=await pdfDoc.getPage(n);const vp0=pg.getViewport({scale:1});const sc=Math.min(3,1600/vp0.width);const vp=pg.getViewport({scale:sc});const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:x,viewport:vp}).promise;return {src:c.toDataURL('image/jpeg',.86),ar:c.height/c.width};}
 $('#pdfPages').addEventListener('click',async e=>{const b=e.target.closest('.pg');if(!b||!pdfDoc)return;const n=+b.dataset.p;b.style.opacity=.5;
-  try{const {src,ar}=await pageToImage(n);const w=780,h=w*ar;const [cx,cy]=toWorld(W/2,H/2);const off=pdfUsed.size%5*24;const o={id:uid(),type:'image',x:cx-w/2+off,y:cy-h/2+off,w,h,src,page:n};objects=[...objects,o];commit();setTool('select');setSel([o.id]);pdfUsed.add(n);b.classList.add('used');}
+  try{const {src,ar}=await pageToImage(n);const w=780,h=w*ar;const [cx,cy]=toWorld(W/2,H/2);const prev=lastPdfId&&byId(lastPdfId);const pos=prev?[prev.x+prev.w+40,prev.y]:[cx-w/2,cy-h/2];const pw=prev?prev.w:w,ph=pw*ar;const o={id:uid(),type:'image',x:pos[0],y:pos[1],w:pw,h:ph,src,page:n};lastPdfId=o.id;objects=[...objects,o];commit();setTool('select');setSel([o.id]);pdfUsed.add(n);b.classList.add('used');}
   catch(err){toast('Не получилось вставить страницу');}b.style.opacity='';});
 $('#pdfAll').onclick=async()=>{if(!pdfDoc)return;const btn=$('#pdfAll');btn.disabled=true;const [cx,cy]=toWorld(W/2,H/2);let x=cx-390,y=cy-200;const ids=[];const added=[];
   for(let n=1;n<=pdfDoc.numPages;n++){btn.textContent=`Вставляю ${n}/${pdfDoc.numPages}`;try{const {src,ar}=await pageToImage(n);const w=780,h=w*ar;const o={id:uid(),type:'image',x,y,w,h,src,page:n};added.push(o);ids.push(o.id);x+=w+40;if(n%4===0){x=cx-390;y+=h+40;}}catch(e){}}
@@ -2067,6 +2132,7 @@ function openSettings(){dlgState={kind:'settings'};const v=window.DOSKA_VERSION|
    <section class="stsec"><h3>Рисование</h3>
      <button type="button" class="toggle${setRow(S.recognize!==false)}" data-st="recog"><span class="stl"><b>Распознавать фигуры</b><span>Задержите перо в конце штриха — круг, многоугольник или линия выровняются</span></span><span class="tr"></span></button>
      <button type="button" class="toggle${setRow(S.snapGrid)}" data-st="snap"><span class="stl"><b>Привязка к сетке</b><span>Фигуры, прямые с Shift и вершины встают по клеткам</span></span><span class="tr"></span></button>
+     <button type="button" class="toggle${setRow(S.align!==false)}" data-st="align"><span class="stl"><b>Выравнивание по другим объектам</b><span>При переносе края и центры прилипают к соседним картинкам, страницам и фигурам. Alt — двигать свободно</span></span><span class="tr"></span></button>
      <button type="button" class="toggle${setRow(penMode)}" data-st="pen"><span class="stl"><b>Только перо</b><span>Пальцем двигаете доску, рисует только стилус</span></span><span class="tr"></span></button></section>
    <section class="stsec"><h3>Вид</h3>
      <button type="button" class="toggle${setRow(!reduceMotion.matches)}" data-st="motion"><span class="stl"><b>Анимации</b><span>Плавное появление меню, досок и объектов</span></span><span class="tr"></span></button>
@@ -2086,6 +2152,7 @@ async function runSettingsUpdate(){const b=$('#stUpdBtn'),t=$('#stUpdText');if(b
 $('#dlgBox').addEventListener('click',e=>{if(!dlgState||dlgState.kind!=='settings')return;const b=e.target.closest('[data-st],[data-nbg],[data-nbgc]');if(!b)return;
   const k=b.dataset.st;
   if(k==='recog'){S.recognize=S.recognize===false;ls.set('settings',S);b.classList.toggle('on',S.recognize!==false);}
+  else if(k==='align'){S.align=S.align===false;ls.set('settings',S);b.classList.toggle('on',S.align!==false);}
   else if(k==='snap'){setSnap(!S.snapGrid,true);b.classList.toggle('on',S.snapGrid);}
   else if(k==='pen'){penMode=!penMode;ls.set('penMode',penMode);updatePenModeUI();b.classList.toggle('on',penMode);}
   else if(k==='motion'){const on=reduceMotion.matches;setMotion(on);ls.set('motion',on);b.classList.toggle('on',on);}
